@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>加指令练习 · 本地题库</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">CO</span>
+      <div class="brand-text">
+        <h1>加指令练习</h1>
+        <p id="subtitle">本地题库</p>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="搜索题目 / 指令 / 编号" autocomplete="off">
+      <select id="stageFilter" aria-label="阶段筛选">
+        <option value="">全部阶段</option>
+      </select>
+      <button id="adminToggle" class="ghost" type="button">管理模式</button>
+    </div>
+  </header>
+
+  <div id="adminbar" class="adminbar hidden">
+    <div class="adminbar-inner">
+      <span class="adminbar-title">管理模式</span>
+      <button id="createBtn" class="primary" type="button">＋ 新增题目</button>
+      <button id="syncReadmeBtn" class="ghost" type="button">同步 README 索引</button>
+      <span id="readmeBadge" class="badge hidden">索引待同步</span>
+      <input id="tokenInput" class="token-input" type="password" placeholder="管理令牌（未启用可留空）" autocomplete="off">
+    </div>
+  </div>
+
+  <main>
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <span id="countLabel">加载中…</span>
+      </div>
+      <ul id="list" class="list"></ul>
+    </aside>
+    <section id="detail" class="detail">
+      <div class="empty">从左侧选择一道题</div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-panel">
+      <header class="modal-head">
+        <h2 id="modalTitle">新增题目</h2>
+        <button id="modalClose" class="icon-btn" type="button" aria-label="关闭">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="grid2">
+          <label>题目 ID
+            <input id="fieldId" type="text" placeholder="P5_L6_lbget_2022">
+          </label>
+          <label>指令名
+            <input id="fieldInstruction" type="text" placeholder="lbget">
+          </label>
+        </div>
+        <label>题面（Markdown）
+          <textarea id="fieldStatement" rows="10" placeholder="# 标题&#10;&#10;> 项目：P5 ｜ 题目 ID：1050 ｜ 来源 PieId：1338 ｜ 类型：文件上传&#10;&#10;题目描述…"></textarea>
+        </label>
+        <label>TS 定义
+          <textarea id="fieldScript" rows="10" placeholder="import type { CustomInstructionDefinition } from '@buaa-co/instructions';&#10;…"></textarea>
+        </label>
+        <label>附件（.class 等，可多选）
+          <input id="fieldFiles" type="file" multiple>
+        </label>
+        <div id="existingAttachments" class="existing-attachments"></div>
+        <p id="modalError" class="form-error hidden"></p>
+      </div>
+      <footer class="modal-foot">
+        <button id="modalCancel" class="ghost" type="button">取消</button>
+        <button id="modalSave" class="primary" type="button">保存</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

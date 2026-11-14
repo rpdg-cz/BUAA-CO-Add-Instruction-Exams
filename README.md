@@ -98,6 +98,16 @@ P3、P4 按课程不启用延迟槽，P5～P7 按课程启用。脚本声明了�
 
 脚本含潜在读写、随机生成与课程冒险时机声明。冒险覆盖来自课程模型，并非对实际 CPU 内部流水线的测量。若自定义定义覆盖了测试前导、处理程序或停机代码所需基础指令的编码，插件会报告具体冲突；可以用用户 ASM 构造相应测试。
 
+## 本地题目管理页面
+
+仓库自带一个零依赖的本地页面，用于浏览题库、跳转原题链接，以及增删改题目并同步下方索引：
+
+```bash
+node tools/exercise-web/server.js
+```
+
+打开 <http://127.0.0.1:8787/> 浏览，<http://127.0.0.1:8787/#admin> 进入管理模式。只使用 Node.js 内置模块，无需安装依赖；配置与接口说明见 [tools/exercise-web/README.md](tools/exercise-web/README.md)。
+
 ## 题目索引
 
 <!-- Exercise table generated from the verified fixture index. -->
