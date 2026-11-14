@@ -160,7 +160,9 @@ test('directory downloads and static traversal fail without taking the server do
   await withServer(t, async (base) => {
     assert.ok([400, 404].includes((await request(base, '/api/exercises/P5_fixture/attachments/directory')).status));
     assert.equal((await request(base, '/vendor/')).status, 404);
-    assert.equal((await request(base, '/..%5c..%5cREADME.md')).status, 403);
+    // A backslash is a path separator on Windows and a literal filename
+    // character on POSIX. Both reject the request without exposing README.
+    assert.equal((await request(base, '/..%5c..%5cREADME.md')).status, process.platform === 'win32' ? 403 : 404);
     assert.equal((await request(base, '/api')).status, 200);
     const detail = JSON.parse((await request(base, '/api/exercises/P5_fixture')).body);
     assert.match(detail.exercise.html, /\/api\/exercises\/P5_fixture\/attachments\/demo.class/);

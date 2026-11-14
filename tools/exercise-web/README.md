@@ -76,7 +76,7 @@ node tools/exercise-web/server.js
 ## 测试
 
 ```bash
-node --test tools/exercise-web/test/
+node tools/exercise-web/run-tests.js
 ```
 
 覆盖题目排序与原题链接解析、JS/TS 增删改查、大小写改名、非法输入不落盘、路径及链接边界、README 内容保留与幂等性，以及 HTTP 来源/文件/配置回归。其中一条用例校验本仓库的 README 索引，新增题目后需同步。
@@ -87,7 +87,7 @@ GitHub Actions 在 Windows / Linux 上分别运行 Node 18、22、26 回归，�
 
 ```powershell
 $env:CO_TOOLKIT_ROOT = 'E:\VSCode\BUAA-CO\extension'
-node --test tools/exercise-web/test/
+node tools/exercise-web/run-tests.js
 ```
 
 外部集成测试需使用支持原生 TS 擦除的 Node（建议与当前 VS Code 相同版本），并先构建 Toolkit；未指定路径时跳过该项。浏览器净化回归默认使用 Windows Edge，其他 Chromium 浏览器可通过 `EXERCISE_WEB_BROWSER` 指定可执行文件路径，不可用时会说明跳过原因。浏览器库来源、许可证和更新方法见 [public/vendor/README.md](public/vendor/README.md)。

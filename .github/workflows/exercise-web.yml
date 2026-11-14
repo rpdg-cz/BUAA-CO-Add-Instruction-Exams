@@ -28,4 +28,4 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - name: Run regression tests
-        run: node --test tools/exercise-web/test/
+        run: node tools/exercise-web/run-tests.js

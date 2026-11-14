@@ -1,6 +1,6 @@
 'use strict';
 
-// Run with: node --test tools/exercise-web/test/
+// Run with: node tools/exercise-web/run-tests.js
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
