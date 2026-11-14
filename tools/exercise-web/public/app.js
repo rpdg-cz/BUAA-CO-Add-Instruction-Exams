@@ -14,13 +14,14 @@ const state = {
   editing: null,
   activeTab: 'statement',
   selectionVersion: 0,
-  filters: { search: '', stage: '' },
+  filters: { search: '', stage: '', category: '' },
 };
 
 const el = {
   subtitle: document.getElementById('subtitle'),
   search: document.getElementById('search'),
   stageFilter: document.getElementById('stageFilter'),
+  categoryFilter: document.getElementById('categoryFilter'),
   adminToggle: document.getElementById('adminToggle'),
   adminbar: document.getElementById('adminbar'),
   createBtn: document.getElementById('createBtn'),
@@ -37,6 +38,7 @@ const el = {
   modalSave: document.getElementById('modalSave'),
   modalError: document.getElementById('modalError'),
   fieldId: document.getElementById('fieldId'),
+  fieldStatus: document.getElementById('fieldStatus'),
   fieldScriptName: document.getElementById('fieldScriptName'),
   fieldScriptLanguage: document.getElementById('fieldScriptLanguage'),
   fieldStatement: document.getElementById('fieldStatement'),
@@ -104,9 +106,12 @@ function visibleExercises() {
   const keyword = state.filters.search.trim().toLowerCase();
   return state.exercises.filter((item) => {
     if (state.filters.stage && item.stage !== state.filters.stage) return false;
+    const category = item.status === 'incomplete' ? 'incomplete' : item.source?.kind || 'course';
+    if (state.filters.category && category !== state.filters.category) return false;
     if (!keyword) return true;
     const haystack = [
-      item.id, item.title, item.scriptName, item.scriptFile,
+      item.id, item.title, item.scriptName, item.scriptFile, item.source?.author, item.source?.year,
+      item.status === 'incomplete' ? '残题' : '',
       item.source && item.source.problemId,
       item.source && item.source.pieId,
     ].filter(Boolean).join(' ').toLowerCase();
@@ -115,7 +120,10 @@ function visibleExercises() {
 }
 
 function renderStages() {
-  const stages = [...new Set(state.exercises.map((item) => item.stage))].sort();
+  const stages = [...new Set(state.exercises.map((item) => item.stage))].sort((a, b) => {
+    const rank = value => value === 'Pre' ? -1 : Number(/^P(\d+)/.exec(value)?.[1] ?? Infinity);
+    return rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0);
+  });
   const current = state.filters.stage;
   el.stageFilter.innerHTML = ['<option value="">全部阶段</option>']
     .concat(stages.map((stage) => `<option value="${escapeHtml(stage)}">${escapeHtml(stage)}</option>`))
@@ -133,7 +141,7 @@ function renderList() {
   el.list.innerHTML = items.map((item) => {
     const active = item.id === state.selectedId ? ' active' : '';
     const script = item.scriptFile ? `<code>${escapeHtml(item.scriptFile)}</code>` : '无脚本';
-    const source = item.source && item.source.problemId
+    const source = item.source?.kind === 'blog' ? `${item.source.provenance === 'proposal' ? '博主自拟资料（非考题）' : '博客'} · ${item.source.author || '往届记录'}${item.status === 'incomplete' ? ' · 行为残缺' : ''}` : item.source && item.source.problemId
       ? `#${item.source.problemId}${item.source.pieId ? ` · Pie ${item.source.pieId}` : ''}`
       : '无原题编号';
     return `<li data-id="${escapeHtml(item.id)}" class="${active.trim()}">
@@ -146,16 +154,17 @@ function renderList() {
 /* ----------------------------- detail ------------------------------ */
 
 function sourceBlock(source) {
+  const isBlog = source?.kind === 'blog';
   if (!source || !/^https?:\/\//i.test(source.url || '')) {
     return `<span class="source-link disabled">
-      <strong>原题链接</strong>
-      <small>题面未记录「题目 ID」</small>
+      <strong>${isBlog ? '来源博客' : '原题链接'}</strong>
+      <small>${isBlog ? '题面未记录有效来源链接' : '题面未记录「题目 ID」'}</small>
     </span>`;
   }
-  const parts = [`ProblemId ${source.problemId}`];
+  const parts = isBlog ? [source.author || '博客整理', source.year || '年份未载'] : [`ProblemId ${source.problemId}`];
   if (source.pieId) parts.push(`PieId ${source.pieId}`);
   return `<a class="source-link" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">
-      <strong>查看原题 ↗</strong>
+      <strong>${isBlog ? '查看来源博客' : '查看原题'} ↗</strong>
       <small>${escapeHtml(parts.join(' · '))}</small>
     </a>
     <button class="ghost copy-btn" type="button" data-action="copy-source">复制链接</button>`;
@@ -212,6 +221,7 @@ function renderDetail() {
   const source = item.source || {};
   const chips = [
     `<span class="chip"><b>${escapeHtml(item.stage)}</b></span>`,
+    `<span class="chip">${item.status === 'incomplete' ? source.provenance === 'proposal' ? '残缺参考资料 · 非考题' : '残题 · 关键行为未还原' : '行为完整'}${source.kind === 'blog' ? ' · 博客整理' : ''}</span>`,
     item.scriptFile ? `<span class="chip">脚本 <b>${escapeHtml(item.scriptFile)}</b></span>` : '<span class="chip">无脚本</span>',
     `<span class="chip">文件 <b>${item.files ? item.files.length : 0}</b></span>`,
     `<span class="chip">更新 <b>${escapeHtml((item.modified || '').slice(0, 10))}</b></span>`,
@@ -288,11 +298,12 @@ function setAdmin(enabled) {
 }
 
 function openEditor(mode, item) {
-  state.editing = { mode, id: item ? item.id : null };
+  state.editing = { mode, id: item ? item.id : null, hasScript: Boolean(item?.scriptFile) };
   el.modalTitle.textContent = mode === 'create' ? '新增题目' : `编辑 ${item.id}`;
   el.modalError.classList.add('hidden');
   el.fieldId.value = item ? item.id : '';
   el.fieldId.disabled = mode === 'edit';
+  el.fieldStatus.value = item?.status || 'complete';
   el.fieldScriptName.value = item ? (item.scriptName || '') : '';
   el.fieldScriptLanguage.value = item ? (item.scriptLanguage || 'ts') : 'ts';
   el.fieldScriptLanguage.disabled = Boolean(item && item.scriptFile);
@@ -335,11 +346,14 @@ async function saveEditor() {
   const mode = state.editing ? state.editing.mode : 'create';
   const id = mode === 'create' ? el.fieldId.value.trim() : state.editing.id;
   const payload = {
-    scriptName: el.fieldScriptName.value.trim(),
-    scriptLanguage: el.fieldScriptLanguage.value,
     statement: el.fieldStatement.value,
-    script: el.fieldScript.value,
+    status: el.fieldStatus.value,
   };
+  if (state.editing?.hasScript || el.fieldScriptName.value.trim() || el.fieldScript.value) {
+    payload.scriptName = el.fieldScriptName.value.trim();
+    payload.scriptLanguage = el.fieldScriptLanguage.value;
+    payload.script = el.fieldScript.value;
+  }
 
   el.modalSave.disabled = true;
   el.modalError.classList.add('hidden');
@@ -419,6 +433,11 @@ el.stageFilter.addEventListener('change', () => {
   renderList();
 });
 
+el.categoryFilter.addEventListener('change', () => {
+  state.filters.category = el.categoryFilter.value;
+  renderList();
+});
+
 el.adminToggle.addEventListener('click', () => setAdmin(!state.admin));
 
 el.createBtn.addEventListener('click', () => openEditor('create'));
@@ -448,7 +467,7 @@ el.detail.addEventListener('click', (event) => {
   if (action.dataset.action === 'delete') removeExercise();
   if (action.dataset.action === 'copy-source') {
     const url = state.detail && state.detail.source && state.detail.source.url;
-    if (url) navigator.clipboard.writeText(url).then(() => toast('原题链接已复制'), () => toast('复制失败', true));
+    if (url) navigator.clipboard.writeText(url).then(() => toast('来源链接已复制'), () => toast('复制失败', true));
   }
 });
 

@@ -13,6 +13,7 @@ const exerciseStore = require('./lib/exercises');
 const readme = require('./lib/readme');
 const { renderMarkdown } = require('./lib/markdown');
 const { SECURITY_HEADERS, createRequestGuard, isLoopback } = require('./lib/http-security');
+const { createDownloadTracker } = require('./lib/downloads');
 
 const DEFAULT_REPO_ROOT = path.resolve(__dirname, '..', '..');
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -58,7 +59,8 @@ async function sendFile(res, filePath, { download = false, head = false } = {}) 
       'Cache-Control': 'no-cache',
     };
     if (download) {
-      headers['Content-Disposition'] = `attachment; filename="${encodeURIComponent(path.basename(filePath))}"`;
+      const encoded = encodeURIComponent(path.basename(filePath)).replace(/[!'()*]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+      headers['Content-Disposition'] = `attachment; filename="${encoded}"; filename*=UTF-8''${encoded}`;
     }
     res.writeHead(200, headers);
     if (head) res.end();
@@ -108,6 +110,7 @@ function createServer(options = {}) {
   const adminToken = options.adminToken != null ? options.adminToken : (process.env.CO_ADMIN_TOKEN || '');
   const quiet = Boolean(options.quiet);
   const parseRequestUrl = createRequestGuard(options.host || process.env.HOST || '127.0.0.1');
+  const downloads = createDownloadTracker();
 
   function assertWritable(req) {
     if (adminToken) {
@@ -175,27 +178,31 @@ function createServer(options = {}) {
       if (!sub && method === 'PUT') {
         assertWritable(req);
         const payload = await readJsonBody(req);
-        sendJson(res, 200, { exercise: exerciseStore.updateExercise(repoRoot, id, payload) });
+        const exercise = await downloads.mutate(id, () => exerciseStore.updateExercise(repoRoot, id, payload));
+        sendJson(res, 200, { exercise });
         return;
       }
       if (!sub && method === 'DELETE') {
         assertWritable(req);
-        sendJson(res, 200, { deleted: exerciseStore.deleteExercise(repoRoot, id) });
+        const deleted = await downloads.mutate(id, () => exerciseStore.deleteExercise(repoRoot, id));
+        sendJson(res, 200, { deleted });
         return;
       }
       if (sub === 'attachments' && name && method === 'GET') {
-        await sendFile(res, exerciseStore.readAttachment(repoRoot, id, name), { download: true });
+        await downloads.track(id, () => sendFile(res, exerciseStore.readAttachment(repoRoot, id, name), { download: true }));
         return;
       }
       if (sub === 'attachments' && name && method === 'PUT') {
         assertWritable(req);
         const body = await readBody(req, MAX_UPLOAD_BYTES);
-        sendJson(res, 200, { exercise: exerciseStore.saveAttachment(repoRoot, id, name, body) });
+        const exercise = await downloads.mutate(id, () => exerciseStore.saveAttachment(repoRoot, id, name, body));
+        sendJson(res, 200, { exercise });
         return;
       }
       if (sub === 'attachments' && name && method === 'DELETE') {
         assertWritable(req);
-        sendJson(res, 200, { exercise: exerciseStore.deleteAttachment(repoRoot, id, name) });
+        const exercise = await downloads.mutate(id, () => exerciseStore.deleteAttachment(repoRoot, id, name));
+        sendJson(res, 200, { exercise });
         return;
       }
     }

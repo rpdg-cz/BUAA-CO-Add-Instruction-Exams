@@ -20,6 +20,12 @@
       <select id="stageFilter" aria-label="阶段筛选">
         <option value="">全部阶段</option>
       </select>
+      <select id="categoryFilter" aria-label="题目分类">
+        <option value="">全部题目</option>
+        <option value="course">课程题库</option>
+        <option value="blog">博客题（行为完整）</option>
+        <option value="incomplete">残题</option>
+      </select>
       <button id="adminToggle" class="ghost" type="button">管理模式</button>
     </div>
   </header>
@@ -57,17 +63,23 @@
           <label>题目 ID
             <input id="fieldId" type="text" placeholder="P5_L6_lbget_2022">
           </label>
-          <label>脚本文件名（不含扩展名）
+          <label>脚本文件名（可留空，不含扩展名）
             <input id="fieldScriptName" type="text" placeholder="lbget">
           </label>
         </div>
+        <label>题目状态
+          <select id="fieldStatus">
+            <option value="complete">行为完整（编码可未载）</option>
+            <option value="incomplete">残题（关键行为缺失或冲突）</option>
+          </select>
+        </label>
         <label>脚本语言（已有脚本保留当前扩展名）
           <select id="fieldScriptLanguage">
             <option value="ts">TypeScript (.ts)</option>
             <option value="js">JavaScript (.js)</option>
           </select>
         </label>
-        <p class="form-hint">这里编辑源码和脚本文件名。实际指令助记符以源码中的 mnemonic 定义为准；修改助记符需编辑源码，重命名文件不会更改定义。</p>
+        <p class="form-hint">没有脚本的博客题可只编辑题面，脚本名与源码同时留空。实际指令助记符以源码中的 mnemonic 为准；重命名文件不会更改定义。残题存放于 incomplete/；缺少 opcode/funct 不作为判残依据。</p>
         <label>题面（Markdown）
           <textarea id="fieldStatement" rows="10" placeholder="# 标题&#10;&#10;> 项目：P5 ｜ 题目 ID：1050 ｜ 来源 PieId：1338 ｜ 类型：文件上传&#10;&#10;题目描述…"></textarea>
         </label>

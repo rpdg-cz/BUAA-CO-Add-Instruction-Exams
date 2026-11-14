@@ -13,7 +13,7 @@ const store = require('../lib/exercises');
 const toolkitRoot = process.env.CO_TOOLKIT_ROOT;
 const repoRoot = path.resolve(__dirname, '../../..');
 
-test('23 份真实指令经网页存储/改名后仍由 Toolkit 按源码加载，JS/TS 均可用', {
+test('真实指令经网页存储/改名后仍由 Toolkit 按源码加载，JS/TS 均可用', {
   skip: toolkitRoot ? false : '设置 CO_TOOLKIT_ROOT 运行真实 Toolkit 集成测试', timeout: 60000,
 }, async t => {
   assert.equal(typeof stripTypeScriptTypes, 'function', 'SDK 集成测试需使用支持原生 TS 擦除的 Node（建议与当前 VS Code 相同版本）');
@@ -47,8 +47,18 @@ test('23 份真实指令经网页存储/改名后仍由 Toolkit 按源码加载�
       worker.postMessage({ protocolVersion: 2, kind: 'request', requestId, jobId: 'exercise-web-test', job: { kind, payload } });
     });
   }
-  const exercises = store.listExercises(repoRoot);
-  assert.equal(exercises.length, 23);
+  const exercises = store.listExercises(repoRoot).filter(item => item.hasScript);
+  assert.ok(exercises.length > 0);
+  const expected = new Map();
+  for (const exercise of exercises) {
+    const workspaceRoot = path.join(temp, 'baseline', exercise.id);
+    const entry = path.join(workspaceRoot, '.co/custom-instructions', exercise.scriptFile);
+    fs.mkdirSync(path.dirname(entry), { recursive: true });
+    fs.writeFileSync(entry, store.readExercise(repoRoot, exercise.id).script);
+    const bundle = await job('script-capture', { workspaceRoot });
+    const inspection = await job('script-job', { bundle, job: { kind: 'script-inspect', payload: null } });
+    expected.set(exercise.id, inspection.instructions);
+  }
   for (const language of ['ts', 'js']) {
     const collection = path.join(temp, language);
     const workspaceRoot = path.join(temp, `cpu-${language}`);
@@ -57,7 +67,7 @@ test('23 份真实指令经网页存储/改名后仍由 Toolkit 按源码加载�
     fs.mkdirSync(path.dirname(entry), { recursive: true });
     for (const exercise of exercises) {
       const original = store.readExercise(repoRoot, exercise.id);
-      const script = language === 'ts' ? original.script : stripTypeScriptTypes(original.script);
+      const script = language === 'js' && original.scriptLanguage === 'ts' ? stripTypeScriptTypes(original.script) : original.script;
       store.createExercise(collection, { id: exercise.id, scriptName: 'sample', scriptLanguage: language, script });
       const saved = store.updateExercise(collection, exercise.id, { scriptName: 'renamed', script });
       assert.equal(saved.scriptFile, `renamed.${language}`);
@@ -66,8 +76,7 @@ test('23 份真实指令经网页存储/改名后仍由 Toolkit 按源码加载�
       fs.writeFileSync(entry, actual);
       const bundle = await job('script-capture', { workspaceRoot });
       const inspection = await job('script-job', { bundle, job: { kind: 'script-inspect', payload: null } });
-      assert.deepEqual(inspection.instructions.map(item => item.mnemonic), [original.scriptName]);
-      for (const mode of ['mars', 'P3', 'P4', 'P5', 'P6', 'P7']) assert.ok(inspection.instructions[0].modes.includes(mode), `${exercise.id} missing ${mode}`);
+      assert.deepEqual(inspection.instructions, expected.get(exercise.id));
     }
   }
 });

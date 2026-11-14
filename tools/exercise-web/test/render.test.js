@@ -32,12 +32,37 @@ function browserHarness(fetch) {
     window: {}, location: {}, navigator: {}, fetch,
     setTimeout() {}, clearTimeout() {},
   });
-  vm.runInContext(`${appSource}\nglobalThis.ui = { state, el, api, selectExercise, openEditor, saveEditor, uploadFiles };`, context);
+  vm.runInContext(`${appSource}\nglobalThis.ui = { state, el, api, selectExercise, openEditor, saveEditor, uploadFiles, visibleExercises, sourceBlock };`, context);
   return { ...context.ui, elements };
 }
 
 const jsonResponse = (data) => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => data });
 const settle = () => new Promise((resolve) => setImmediate(resolve));
+
+test('blog and incomplete filters preserve source identity, and document-only edits omit script fields', async () => {
+  const requests = [];
+  const item = { id: 'P0_中文题_2024_blog', stage: 'P0', status: 'complete', statement: '# 中文题\n', files: [],
+    source: { kind: 'blog', author: '作者', year: '2024', url: 'https://example.invalid/blog' } };
+  const ui = browserHarness(async (url, options) => {
+    requests.push({ url, options });
+    return jsonResponse(url === '/api/exercises' ? { exercises: [] } : { exercise: item });
+  });
+  await settle();
+  ui.state.exercises = [item,
+    { id: 'P5_course', stage: 'P5', status: 'complete', source: { kind: 'course' } },
+    { id: 'P7_残题_blog', stage: 'P7', status: 'incomplete', source: { kind: 'blog' } }];
+  ui.state.filters.category = 'blog';
+  assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), [item.id]);
+  ui.state.filters.category = 'incomplete';
+  assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), ['P7_残题_blog']);
+  assert.match(ui.sourceBlock(item.source), /查看来源博客/);
+  assert.doesNotMatch(ui.sourceBlock(item.source), /ProblemId/);
+  ui.openEditor('edit', item);
+  ui.el.fieldStatus.value = 'incomplete';
+  await ui.saveEditor();
+  const payload = JSON.parse(requests.find(row => row.options?.method === 'PUT').options.body);
+  assert.deepEqual(payload, { statement: item.statement, status: 'incomplete' });
+});
 
 test('real course Markdown preserves tables and maps its existing class attachment', () => {
   const id = 'P3_L10_addm_2023';
@@ -120,7 +145,10 @@ test('the served page loads its local sanitizer and real course detail under CSP
   skip: !fs.existsSync(browserPath) && 'Set EXERCISE_WEB_BROWSER to a Chromium browser to run DOM integration coverage',
 }, async t => {
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'exercise-web-served-'));
-  const server = createServer({ repoRoot, quiet: true });
+  const collection = path.join(temporary, 'repo');
+  fs.mkdirSync(collection);
+  fs.cpSync(path.join(repoRoot, 'P3_L10_addm_2023'), path.join(collection, 'P3_L10_addm_2023'), { recursive: true });
+  const server = createServer({ repoRoot: collection, quiet: true });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => {
     await new Promise(resolve => server.close(resolve));
@@ -131,7 +159,7 @@ test('the served page loads its local sanitizer and real course detail under CSP
     `--user-data-dir=${path.join(temporary, 'profile')}`, '--virtual-time-budget=3000',
     '--dump-dom', `http://127.0.0.1:${server.address().port}/`,
   ], { encoding: 'utf8', timeout: 30000, maxBuffer: 4 * 1024 * 1024, windowsHide: true });
-  assert.match(result.stdout, /id="countLabel">23 \/ 23 道题/);
+  assert.match(result.stdout, /id="countLabel">1 \/ 1 道题/);
   assert.match(result.stdout, /class="detail-title">P3_L10_addm_2023/);
   assert.match(result.stdout, /rowspan="3"/);
   assert.match(result.stdout, /href="\/api\/exercises\/P3_L10_addm_2023\/attachments\/addm.class"/);
