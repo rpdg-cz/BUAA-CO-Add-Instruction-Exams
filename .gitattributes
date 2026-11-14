@@ -2,3 +2,4 @@
 *.md text eol=lf
 *.ts text eol=lf
 *.class binary
+tools/exercise-web/public/vendor/* text eol=lf
