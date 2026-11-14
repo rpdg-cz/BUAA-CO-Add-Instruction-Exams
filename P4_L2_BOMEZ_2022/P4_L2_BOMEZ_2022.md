@@ -1,0 +1,113 @@
+# P4_L2_BOMEZ_2022
+
+> 项目：P4 ｜ 题目 ID：983 ｜ 来源 PieId：1338 ｜ 类型：文件上传
+
+**<font color=red>这道题的 class 文件有误，请使用 PId=1097</font>**
+
+
+<table style="border-collapse:collapse; width: 500pt;">
+      <tr>
+        <td id="td-head" rowspan="3">
+                编码
+            </td>
+        <td id="td-opcode-top">
+          <span style="float: left;">31</span>
+          <span style="float: right;">26</span>
+        </td>
+        <td id="td-rs-top">
+          <span style="float: left;">25</span>
+          <span style="float: right;">21</span>
+        </td>
+        <td id="td-rt-top">
+          <span style="float: left;">20</span>
+          <span style="float: right;">16</span>
+        </td>
+        <td id="td-imm-top">
+          <span style="float: left;">15</span>
+          <span style="float: right;">0</span>
+        </td>
+      </tr>
+      <tr>
+        <td id="td-opcode">
+                BOMEZ<br/>
+                101100
+            </td>
+        <td id="td-rs">rs</td>
+        <td id="td-rt">rt</td>
+        <td id="td-imm">
+                offset
+            </td>
+      </tr>
+      <tr>
+        <td id="td-opcode-bottom">
+                6
+            </td>
+        <td id="td-rs-bottom">
+                5
+            </td>
+        <td id="td-rt-bottom">
+                5
+            </td>
+        <td id="td-imm-bottom">
+                16
+            </td>
+      </tr>
+      <tr>
+        <td id="td-head">
+                格式
+            </td>
+        <td colspan="4">
+          <p id="p-code">
+                bomez rs, rt offset
+                </p>
+        </td>
+      </tr>
+      <tr>
+        <td id="td-head">
+                描述
+            </td>
+        <td colspan="4">
+          <p id="p-text">
+                GPR[rs] 和 GPR[rt] 用二进制表示后，如果GPR[rs]的1的数量和GPR[rt]的1的数量均不为0，且GPR[rs]的1的数量模GPR[rt]的1的数量等于0，则跳转。
+                </p>
+        </td>
+      </tr>
+      <tr>
+        <td id="td-head">
+                操作
+            </td>
+        <td colspan="4">
+          <p id="p-code">a ← GPR[rs]<sub>31</sub>+GPR[rs]<sub>30</sub>+...+GPR[rs]<sub>0</sub></p>
+          <p id="p-code">b ← GPR[rt]<sub>31</sub>+GPR[rt]<sub>30</sub>+...+GPR[rt]<sub>0</sub></p>
+          <p id="p-code">if a != 0 and b != 0 and a % b == 0 then</p>
+          <p id="p-code" style="text-indent: 4em">PC ← PC + 4 + sign_extend(offset||0<sup>2</sup>)</p>
+          <p id="p-code">else</p>
+          <p id="p-code" style="text-indent: 4em">PC ← PC + 4</p>
+          <p id="p-code">endif</p>
+        </td>
+      </tr>
+      <tr>
+        <td id="td-head">
+                示例
+            </td>
+        <td colspan="4">
+          <p id="p-code">
+                    bomez $t1, $t2, loop
+                </p>
+        </td>
+      </tr>
+      <tr>
+        <td id="td-head">
+                其他
+            </td>
+        <td colspan="4">
+          <p id="p-text">
+                  无
+                </p>
+        </td>
+      </tr>
+    </table>
+
+## 附件
+
+- [bomez.class](bomez.class)
