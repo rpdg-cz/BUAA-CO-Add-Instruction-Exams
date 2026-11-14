@@ -7,10 +7,12 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
+const { pipeline } = require('node:stream/promises');
 
 const exerciseStore = require('./lib/exercises');
 const readme = require('./lib/readme');
 const { renderMarkdown } = require('./lib/markdown');
+const { SECURITY_HEADERS, createRequestGuard, isLoopback } = require('./lib/http-security');
 
 const DEFAULT_REPO_ROOT = path.resolve(__dirname, '..', '..');
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -37,19 +39,33 @@ function sendJson(res, status, payload) {
   res.end(body);
 }
 
-function sendFile(res, filePath, { download = false } = {}) {
-  const stat = fs.statSync(filePath);
-  const ext = path.extname(filePath).toLowerCase();
-  const headers = {
-    'Content-Type': CONTENT_TYPES[ext] || 'application/octet-stream',
-    'Content-Length': stat.size,
-    'Cache-Control': 'no-cache',
-  };
-  if (download) {
-    headers['Content-Disposition'] = `attachment; filename="${encodeURIComponent(path.basename(filePath))}"`;
+async function sendFile(res, filePath, { download = false, head = false } = {}) {
+  let file;
+  try {
+    file = await fs.promises.open(filePath, 'r');
+  } catch (error) {
+    if (['ENOENT', 'ENOTDIR', 'EISDIR'].includes(error.code)) throw new exerciseStore.AppError(404, '文件不存在');
+    if (['EACCES', 'EPERM'].includes(error.code)) throw new exerciseStore.AppError(403, '无法读取文件');
+    throw error;
   }
-  res.writeHead(200, headers);
-  fs.createReadStream(filePath).pipe(res);
+  try {
+    const stat = await file.stat();
+    if (!stat.isFile()) throw new exerciseStore.AppError(404, '文件不存在');
+    const ext = path.extname(filePath).toLowerCase();
+    const headers = {
+      'Content-Type': CONTENT_TYPES[ext] || 'application/octet-stream',
+      'Content-Length': stat.size,
+      'Cache-Control': 'no-cache',
+    };
+    if (download) {
+      headers['Content-Disposition'] = `attachment; filename="${encodeURIComponent(path.basename(filePath))}"`;
+    }
+    res.writeHead(200, headers);
+    if (head) res.end();
+    else await pipeline(file.createReadStream({ autoClose: false }), res);
+  } finally {
+    await file.close();
+  }
 }
 
 function readBody(req, limit) {
@@ -60,7 +76,7 @@ function readBody(req, limit) {
       total += chunk.length;
       if (total > limit) {
         reject(new exerciseStore.AppError(413, '请求体过大'));
-        req.destroy();
+        chunks.length = 0;
         return;
       }
       chunks.push(chunk);
@@ -71,24 +87,27 @@ function readBody(req, limit) {
 }
 
 async function readJsonBody(req) {
+  if (!/^application\/json(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
+    throw new exerciseStore.AppError(415, '请求体必须使用 application/json');
+  }
   const raw = await readBody(req, MAX_JSON_BYTES);
-  if (!raw.length) return {};
+  let payload;
   try {
-    return JSON.parse(raw.toString('utf8'));
+    payload = JSON.parse(raw.toString('utf8'));
   } catch {
     throw new exerciseStore.AppError(400, '请求体不是合法的 JSON');
   }
-}
-
-function isLoopback(address) {
-  if (!address) return false;
-  return address === '::1' || address === '127.0.0.1' || address.startsWith('127.') || address === '::ffff:127.0.0.1';
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new exerciseStore.AppError(400, 'JSON 请求体必须是对象');
+  }
+  return payload;
 }
 
 function createServer(options = {}) {
-  const repoRoot = options.repoRoot ? path.resolve(options.repoRoot) : DEFAULT_REPO_ROOT;
+  const repoRoot = path.resolve(options.repoRoot || process.env.CO_REPO_ROOT || DEFAULT_REPO_ROOT);
   const adminToken = options.adminToken != null ? options.adminToken : (process.env.CO_ADMIN_TOKEN || '');
   const quiet = Boolean(options.quiet);
+  const parseRequestUrl = createRequestGuard(options.host || process.env.HOST || '127.0.0.1');
 
   function assertWritable(req) {
     if (adminToken) {
@@ -103,7 +122,7 @@ function createServer(options = {}) {
   }
 
   function serialize(exercise) {
-    return { ...exercise, html: renderMarkdown(exercise.statement || '') };
+    return { ...exercise, html: renderMarkdown(exercise.statement || '', { exerciseId: exercise.id, files: exercise.files }) };
   }
 
   function listPayload() {
@@ -165,7 +184,7 @@ function createServer(options = {}) {
         return;
       }
       if (sub === 'attachments' && name && method === 'GET') {
-        sendFile(res, exerciseStore.readAttachment(repoRoot, id, name), { download: true });
+        await sendFile(res, exerciseStore.readAttachment(repoRoot, id, name), { download: true });
         return;
       }
       if (sub === 'attachments' && name && method === 'PUT') {
@@ -204,38 +223,54 @@ function createServer(options = {}) {
     throw new exerciseStore.AppError(404, `未找到接口 ${url.pathname}`);
   }
 
-  function handleStatic(req, res, url) {
+  async function handleStatic(req, res, url) {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      res.writeHead(405, { Allow: 'GET, HEAD' }).end();
+      return;
+    }
     let relative = decodeURIComponent(url.pathname);
     if (relative === '/' || relative === '') relative = '/index.html';
-    const target = path.normalize(path.join(PUBLIC_DIR, relative));
-    if (!target.startsWith(PUBLIC_DIR)) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Forbidden');
-      return;
+    const target = path.resolve(PUBLIC_DIR, `.${relative}`);
+    function assertStaticInside(root, file) {
+      const rel = path.relative(root, file);
+      if (rel === '..' || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel)) {
+        throw new exerciseStore.AppError(403, '静态文件路径越界');
+      }
     }
-    if (!fs.existsSync(target) || !fs.statSync(target).isFile()) {
-      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');
-      return;
+    assertStaticInside(PUBLIC_DIR, target);
+    let realTarget;
+    try {
+      const realRoot = await fs.promises.realpath(PUBLIC_DIR);
+      realTarget = await fs.promises.realpath(target);
+      assertStaticInside(realRoot, realTarget);
+    } catch (error) {
+      if (['ENOENT', 'ENOTDIR'].includes(error.code)) throw new exerciseStore.AppError(404, '文件不存在');
+      throw error;
     }
-    sendFile(res, target);
+    await sendFile(res, realTarget, { head: req.method === 'HEAD' });
   }
 
   return http.createServer((req, res) => {
     const started = Date.now();
-    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value);
     if (!quiet) {
       res.on('finish', () => {
-        console.log(`${req.method} ${url.pathname} ${res.statusCode} ${Date.now() - started}ms`);
+        console.log(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - started}ms`);
       });
     }
 
-    const run = url.pathname === '/api' || url.pathname.startsWith('/api/')
-      ? handleApi(req, res, url)
-      : Promise.resolve().then(() => handleStatic(req, res, url));
+    const run = Promise.resolve().then(() => {
+      const url = parseRequestUrl(req);
+      return url.pathname === '/api' || url.pathname.startsWith('/api/')
+        ? handleApi(req, res, url)
+        : handleStatic(req, res, url);
+    });
 
     run.catch((error) => {
       const status = error instanceof exerciseStore.AppError ? error.status : 500;
       if (status >= 500) console.error(error);
-      if (!res.headersSent) sendJson(res, status, { error: error.message || '服务器内部错误' });
+      if (!res.headersSent && !res.destroyed) sendJson(res, status, { error: error.message || '服务器内部错误' });
+      else if (!res.destroyed) res.destroy();
     });
   });
 }
@@ -243,14 +278,17 @@ function createServer(options = {}) {
 if (require.main === module) {
   const HOST = process.env.HOST || '127.0.0.1';
   const PORT = Number(process.env.PORT || 8787);
-  const server = createServer();
+  const repoRoot = path.resolve(process.env.CO_REPO_ROOT || DEFAULT_REPO_ROOT);
+  const server = createServer({ repoRoot, host: HOST });
   server.listen(PORT, HOST, () => {
-    const shown = HOST === '0.0.0.0' || HOST === '::' ? '127.0.0.1' : HOST;
+    const shownHost = HOST === '0.0.0.0' || HOST === '::' ? '127.0.0.1' : HOST;
+    const shown = shownHost.includes(':') ? `[${shownHost}]` : shownHost;
+    const port = server.address().port;
     console.log('');
     console.log('  加指令练习 · 本地题库');
-    console.log(`  仓库目录  ${DEFAULT_REPO_ROOT}`);
-    console.log(`  浏览页面  http://${shown}:${PORT}/`);
-    console.log(`  管理模式  http://${shown}:${PORT}/#admin`);
+    console.log(`  仓库目录  ${repoRoot}`);
+    console.log(`  浏览页面  http://${shown}:${port}/`);
+    console.log(`  管理模式  http://${shown}:${port}/#admin`);
     if (HOST !== '127.0.0.1' && HOST !== '::1' && !process.env.CO_ADMIN_TOKEN) {
       console.log('  ⚠ 已监听非本机地址但未设置 CO_ADMIN_TOKEN：写操作会默认拒绝。');
     }

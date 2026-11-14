@@ -344,7 +344,7 @@ main {
 
 .modal-body label { display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; color: #444; }
 
-.modal-body input[type="text"], .modal-body textarea, .modal-body input[type="file"] {
+.modal-body input[type="text"], .modal-body textarea, .modal-body input[type="file"], .modal-body select {
   border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
   background: #fbfcfd; width: 100%;
 }
@@ -358,6 +358,7 @@ main {
 }
 
 .form-error { color: var(--danger); font-size: 12.5px; margin: 0; }
+.form-hint { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 0; }
 
 .existing-attachments { display: flex; flex-wrap: wrap; gap: 8px; }
 

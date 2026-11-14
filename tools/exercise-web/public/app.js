@@ -13,6 +13,7 @@ const state = {
   token: localStorage.getItem('co-admin-token') || '',
   editing: null,
   activeTab: 'statement',
+  selectionVersion: 0,
   filters: { search: '', stage: '' },
 };
 
@@ -36,7 +37,8 @@ const el = {
   modalSave: document.getElementById('modalSave'),
   modalError: document.getElementById('modalError'),
   fieldId: document.getElementById('fieldId'),
-  fieldInstruction: document.getElementById('fieldInstruction'),
+  fieldScriptName: document.getElementById('fieldScriptName'),
+  fieldScriptLanguage: document.getElementById('fieldScriptLanguage'),
   fieldStatement: document.getElementById('fieldStatement'),
   fieldScript: document.getElementById('fieldScript'),
   fieldFiles: document.getElementById('fieldFiles'),
@@ -73,7 +75,10 @@ function toast(message, isError = false) {
 
 async function api(path, options = {}) {
   const headers = { ...(options.headers || {}) };
-  if (options.method && options.method !== 'GET') headers['X-Admin-Token'] = state.token;
+  if (options.method && options.method !== 'GET') {
+    headers['X-Admin-Token'] = state.token;
+    headers['X-Requested-With'] = 'exercise-web';
+  }
   if (options.json !== undefined) {
     headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(options.json);
@@ -101,7 +106,7 @@ function visibleExercises() {
     if (state.filters.stage && item.stage !== state.filters.stage) return false;
     if (!keyword) return true;
     const haystack = [
-      item.id, item.title, item.instruction,
+      item.id, item.title, item.scriptName, item.scriptFile,
       item.source && item.source.problemId,
       item.source && item.source.pieId,
     ].filter(Boolean).join(' ').toLowerCase();
@@ -127,13 +132,13 @@ function renderList() {
   }
   el.list.innerHTML = items.map((item) => {
     const active = item.id === state.selectedId ? ' active' : '';
-    const instruction = item.instruction ? `<code>${escapeHtml(item.instruction)}</code>` : '无脚本';
+    const script = item.scriptFile ? `<code>${escapeHtml(item.scriptFile)}</code>` : '无脚本';
     const source = item.source && item.source.problemId
       ? `#${item.source.problemId}${item.source.pieId ? ` · Pie ${item.source.pieId}` : ''}`
       : '无原题编号';
     return `<li data-id="${escapeHtml(item.id)}" class="${active.trim()}">
       <div class="item-title"><span class="stage ${escapeHtml(item.stage)}">${escapeHtml(item.stage)}</span>${escapeHtml(item.id)}</div>
-      <div class="item-meta"><span>${instruction}</span><span>${escapeHtml(source)}</span></div>
+      <div class="item-meta"><span>${script}</span><span>${escapeHtml(source)}</span></div>
     </li>`;
   }).join('');
 }
@@ -141,7 +146,7 @@ function renderList() {
 /* ----------------------------- detail ------------------------------ */
 
 function sourceBlock(source) {
-  if (!source || !source.url) {
+  if (!source || !/^https?:\/\//i.test(source.url || '')) {
     return `<span class="source-link disabled">
       <strong>原题链接</strong>
       <small>题面未记录「题目 ID」</small>
@@ -167,6 +172,37 @@ function attachmentsBlock(item) {
     </div>`).join('')}</div>`;
 }
 
+const statementUrlPattern = /^(?:https?:\/\/|mailto:|#|\/api\/exercises\/[^/]+\/attachments\/[^/?#]+(?:[?#]|$))/i;
+let sanitizerHookInstalled = false;
+
+function sanitizeStatement(html) {
+  // Fail closed if the local sanitizer could not load. Do not insert untrusted
+  // statement markup anywhere else in this application.
+  if (!window.DOMPurify || !window.DOMPurify.isSupported) return escapeHtml(html);
+  if (!sanitizerHookInstalled) {
+    window.DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
+      if ((data.attrName === 'href' || data.attrName === 'src') && !statementUrlPattern.test(data.attrValue)) {
+        data.keepAttr = false;
+      }
+    });
+    sanitizerHookInstalled = true;
+  }
+  return window.DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['a', 'p', 'br', 'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'strong', 'b', 'em', 'i',
+      'del', 's', 'u', 'sub', 'sup', 'span', 'div', 'img', 'table', 'caption',
+      'colgroup', 'col', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'details', 'summary'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'colspan', 'rowspan', 'align',
+      'width', 'height', 'loading', 'start', 'reversed', 'scope'],
+    ADD_URI_SAFE_ATTR: ['colspan', 'rowspan', 'align', 'width', 'height', 'loading', 'start', 'reversed', 'scope'],
+    ALLOW_DATA_ATTR: false,
+    ALLOW_ARIA_ATTR: false,
+    // Relative URLs are only allowed after the server has mapped an existing
+    // exercise file to its constrained attachment endpoint.
+    ALLOWED_URI_REGEXP: statementUrlPattern,
+  });
+}
+
 function renderDetail() {
   const item = state.detail;
   if (!item) {
@@ -176,7 +212,7 @@ function renderDetail() {
   const source = item.source || {};
   const chips = [
     `<span class="chip"><b>${escapeHtml(item.stage)}</b></span>`,
-    item.instruction ? `<span class="chip">指令 <b>${escapeHtml(item.instruction)}</b></span>` : '<span class="chip">无脚本</span>',
+    item.scriptFile ? `<span class="chip">脚本 <b>${escapeHtml(item.scriptFile)}</b></span>` : '<span class="chip">无脚本</span>',
     `<span class="chip">文件 <b>${item.files ? item.files.length : 0}</b></span>`,
     `<span class="chip">更新 <b>${escapeHtml((item.modified || '').slice(0, 10))}</b></span>`,
   ];
@@ -185,7 +221,7 @@ function renderDetail() {
 
   const tabs = [
     ['statement', '题面'],
-    ['script', 'TS 脚本'],
+    ['script', item.scriptLanguage ? `${item.scriptLanguage.toUpperCase()} 脚本` : '脚本'],
     ['attachments', `附件 (${(item.attachments || []).length})`],
   ];
 
@@ -193,11 +229,11 @@ function renderDetail() {
   if (state.activeTab === 'script') {
     body = item.script
       ? `<pre class="code">${escapeHtml(item.script)}</pre>`
-      : '<p style="color:#6b7280">该题没有 TS 脚本。</p>';
+      : '<p style="color:#6b7280">该题没有脚本。</p>';
   } else if (state.activeTab === 'attachments') {
     body = attachmentsBlock(item);
   } else {
-    body = `<div class="statement">${item.html || '<p style="color:#6b7280">该题没有题面。</p>'}</div>`;
+    body = `<div class="statement">${sanitizeStatement(item.html || '<p>该题没有题面。</p>')}</div>`;
   }
 
   const adminActions = state.admin
@@ -222,14 +258,20 @@ function renderDetail() {
 }
 
 async function selectExercise(id) {
+  const version = ++state.selectionVersion;
   state.selectedId = id;
+  state.detail = null;
   state.activeTab = 'statement';
   renderList();
+  el.detail.innerHTML = '<div class="empty">加载中…</div>';
   try {
     const data = await api(`/api/exercises/${encodeURIComponent(id)}`);
+    if (version !== state.selectionVersion) return;
     state.detail = data.exercise;
     renderDetail();
   } catch (error) {
+    if (version !== state.selectionVersion) return;
+    el.detail.innerHTML = '<div class="empty">题目加载失败，请重新选择。</div>';
     toast(`加载失败：${error.message}`, true);
   }
 }
@@ -251,7 +293,9 @@ function openEditor(mode, item) {
   el.modalError.classList.add('hidden');
   el.fieldId.value = item ? item.id : '';
   el.fieldId.disabled = mode === 'edit';
-  el.fieldInstruction.value = item ? (item.instruction || '') : '';
+  el.fieldScriptName.value = item ? (item.scriptName || '') : '';
+  el.fieldScriptLanguage.value = item ? (item.scriptLanguage || 'ts') : 'ts';
+  el.fieldScriptLanguage.disabled = Boolean(item && item.scriptFile);
   el.fieldStatement.value = item ? (item.statement || '') : '';
   el.fieldScript.value = item ? (item.script || '') : '';
   el.fieldFiles.value = '';
@@ -277,7 +321,7 @@ async function uploadFiles(id, files) {
   for (const file of files) {
     const response = await fetch(
       `/api/exercises/${encodeURIComponent(id)}/attachments/${encodeURIComponent(file.name)}`,
-      { method: 'PUT', headers: { 'X-Admin-Token': state.token }, body: file },
+      { method: 'PUT', headers: { 'X-Admin-Token': state.token, 'X-Requested-With': 'exercise-web' }, body: file },
     );
     if (!response.ok) {
       let message = `HTTP ${response.status}`;
@@ -291,7 +335,8 @@ async function saveEditor() {
   const mode = state.editing ? state.editing.mode : 'create';
   const id = mode === 'create' ? el.fieldId.value.trim() : state.editing.id;
   const payload = {
-    instruction: el.fieldInstruction.value.trim(),
+    scriptName: el.fieldScriptName.value.trim(),
+    scriptLanguage: el.fieldScriptLanguage.value,
     statement: el.fieldStatement.value,
     script: el.fieldScript.value,
   };
@@ -328,6 +373,7 @@ async function removeExercise() {
   if (!ok) return;
   try {
     await api(`/api/exercises/${encodeURIComponent(item.id)}`, { method: 'DELETE' });
+    ++state.selectionVersion;
     state.detail = null;
     state.selectedId = null;
     toast('已删除');

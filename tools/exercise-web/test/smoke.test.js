@@ -13,9 +13,13 @@ const { renderMarkdown } = require('../lib/markdown');
 const { createServer } = require('../server');
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
+const fixtures = [];
+const scriptSource = (id, name) => fs.readFileSync(path.join(REPO_ROOT, id, `${name}.ts`), 'utf8');
+test.after(() => fixtures.forEach(root => fs.rmSync(root, { recursive: true, force: true })));
 
 function makeFixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'exercise-web-'));
+  fixtures.push(root);
   fs.writeFileSync(path.join(root, 'README.md'), '# 测试题库\n\n## 题目索引\n\n');
 
   const rlb = path.join(root, 'P4_L1_RLB_2022');
@@ -30,7 +34,7 @@ function makeFixture() {
     '测试题面。',
     '',
   ].join('\n'));
-  fs.writeFileSync(path.join(rlb, 'rlb.ts'), 'export const mnemonic = "rlb";\n');
+  fs.writeFileSync(path.join(rlb, 'rlb.ts'), scriptSource('P4_L1_RLB_2022', 'rlb'));
   fs.writeFileSync(path.join(rlb, 'rlb.class'), Buffer.from([0xca, 0xfe, 0xba, 0xbe]));
 
   const lbget = path.join(root, 'P5_L6_lbget_2022');
@@ -41,7 +45,7 @@ function makeFixture() {
     '> 项目：P5 ｜ 题目 ID：1050 ｜ 来源 PieId：1338 ｜ 类型：文件上传',
     '',
   ].join('\n'));
-  fs.writeFileSync(path.join(lbget, 'lbget.ts'), 'export const mnemonic = "lbget";\n');
+  fs.writeFileSync(path.join(lbget, 'lbget.ts'), scriptSource('P5_L6_lbget_2022', 'lbget'));
 
   return root;
 }
@@ -65,7 +69,7 @@ test('题目列表按阶段和题号排序，并解析原题链接', () => {
 
   const rlb = exercises[0];
   assert.equal(rlb.stage, 'P4');
-  assert.equal(rlb.instruction, 'rlb');
+  assert.equal(rlb.scriptName, 'rlb');
   assert.equal(rlb.source.problemId, 1001);
   assert.equal(rlb.source.pieId, 1200);
   assert.equal(rlb.source.url, 'http://cscore.buaa.edu.cn/#/problem?ProblemId=1001&PieId=1200');
@@ -78,20 +82,21 @@ test('新增、修改、删除题目', () => {
 
   const created = store.createExercise(root, {
     id: 'P3_L10_addm_2023',
-    instruction: 'addm',
+    scriptName: 'addm',
+    scriptLanguage: 'ts',
     statement: '# P3_L10_addm_2023\n\n> 题目 ID：900 ｜ 来源 PieId：910\n',
-    script: 'export const mnemonic = "addm";\n',
+    script: scriptSource('P3_L10_addm_2023', 'addm'),
   });
   assert.equal(created.id, 'P3_L10_addm_2023');
-  assert.equal(created.instruction, 'addm');
+  assert.equal(created.scriptName, 'addm');
   assert.equal(created.source.problemId, 900);
 
   const updated = store.updateExercise(root, 'P3_L10_addm_2023', {
-    instruction: 'addm2',
+    scriptName: 'addm2',
     statement: '# P3_L10_addm_2023\n\n改过的题面\n',
-    script: 'export const mnemonic = "addm2";\n',
+    script: scriptSource('P3_L10_addm_2023', 'addm'),
   });
-  assert.equal(updated.instruction, 'addm2');
+  assert.equal(updated.scriptName, 'addm2');
   assert.ok(fs.existsSync(path.join(root, 'P3_L10_addm_2023', 'addm2.ts')));
   assert.ok(!fs.existsSync(path.join(root, 'P3_L10_addm_2023', 'addm.ts')));
 
@@ -101,7 +106,7 @@ test('新增、修改、删除题目', () => {
 
 test('非法 ID 与路径穿越被拒绝', () => {
   const root = makeFixture();
-  assert.throws(() => store.createExercise(root, { id: '../escape', instruction: 'x' }), /题目 ID/);
+  assert.throws(() => store.createExercise(root, { id: '../escape', scriptName: 'x', scriptLanguage: 'ts' }), /题目 ID/);
   assert.throws(() => store.readExercise(root, '..'), /题目 ID/);
   assert.throws(() => store.saveAttachment(root, 'P4_L1_RLB_2022', '../x.class', Buffer.from('x')), /文件名/);
 });
@@ -140,13 +145,14 @@ test('HTTP 接口覆盖浏览与增删改查', async () => {
 
     const created = await fetch(`${base}/api/exercises`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: 'P6_L1_demo_2026', instruction: 'demo', statement: '# demo\n', script: 'export const mnemonic="demo";\n' }),
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'exercise-web' },
+      body: JSON.stringify({ id: 'P6_L1_demo_2026', scriptName: 'demo', scriptLanguage: 'ts', statement: '# demo\n', script: scriptSource('P4_L1_RLB_2022', 'rlb') }),
     });
     assert.equal(created.status, 201);
 
     const upload = await fetch(`${base}/api/exercises/P6_L1_demo_2026/attachments/demo.class`, {
       method: 'PUT',
+      headers: { 'X-Requested-With': 'exercise-web' },
       body: Buffer.from([0xca, 0xfe]),
     });
     assert.equal(upload.status, 200);
@@ -155,10 +161,10 @@ test('HTTP 接口覆盖浏览与增删改查', async () => {
     assert.equal(download.status, 200);
     assert.equal(Buffer.from(await download.arrayBuffer()).length, 2);
 
-    const synced = await (await fetch(`${base}/api/readme`, { method: 'POST' })).json();
+    const synced = await (await fetch(`${base}/api/readme`, { method: 'POST', headers: { 'X-Requested-With': 'exercise-web' } })).json();
     assert.equal(synced.changed, true);
 
-    const removed = await fetch(`${base}/api/exercises/P6_L1_demo_2026`, { method: 'DELETE' });
+    const removed = await fetch(`${base}/api/exercises/P6_L1_demo_2026`, { method: 'DELETE', headers: { 'X-Requested-With': 'exercise-web' } });
     assert.equal(removed.status, 200);
 
     const missing = await fetch(`${base}/api/exercises/P6_L1_demo_2026`);
@@ -175,15 +181,15 @@ test('设置管理令牌后写操作需要令牌', async () => {
   await withServer(async (base) => {
     const denied = await fetch(`${base}/api/exercises`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: 'P6_L2_demo_2026', instruction: 'demo' }),
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'exercise-web' },
+      body: JSON.stringify({ id: 'P6_L2_demo_2026', scriptName: 'demo', scriptLanguage: 'ts' }),
     });
     assert.equal(denied.status, 401);
 
     const allowed = await fetch(`${base}/api/exercises`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Token': 'secret' },
-      body: JSON.stringify({ id: 'P6_L2_demo_2026', instruction: 'demo' }),
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Token': 'secret', 'X-Requested-With': 'exercise-web' },
+      body: JSON.stringify({ id: 'P6_L2_demo_2026', scriptName: 'demo', scriptLanguage: 'ts' }),
     });
     assert.equal(allowed.status, 201);
   }, { repoRoot: root, adminToken: 'secret' });

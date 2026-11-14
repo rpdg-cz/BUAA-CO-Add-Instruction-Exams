@@ -100,19 +100,19 @@ P3、P4 按课程不启用延迟槽，P5～P7 按课程启用。脚本声明了�
 
 ## 本地题目管理页面
 
-仓库自带一个零依赖的本地页面，用于浏览题库、跳转原题链接，以及增删改题目并同步下方索引：
+仓库自带一个本地页面，用于浏览题库、跳转原题链接，以及增删改题目并同步下方索引：
 
 ```bash
 node tools/exercise-web/server.js
 ```
 
-打开 <http://127.0.0.1:8787/> 浏览，<http://127.0.0.1:8787/#admin> 进入管理模式。只使用 Node.js 内置模块，无需安装依赖；配置与接口说明见 [tools/exercise-web/README.md](tools/exercise-web/README.md)。
+打开 <http://127.0.0.1:8787/> 浏览，<http://127.0.0.1:8787/#admin> 进入管理模式。需要 Node.js 18 或更新版本，后端只使用内置模块，浏览器端已随仓库附带 DOMPurify，无需安装依赖或连接 CDN。这个工具只管理题库文件；实际指令助记符以 JS/TS 源码中的 `mnemonic` 为准，修改脚本文件名不会修改指令定义。配置与接口说明见 [tools/exercise-web/README.md](tools/exercise-web/README.md)。
 
 ## 题目索引
 
 <!-- Exercise table generated from the verified fixture index. -->
 
-| 练习 | 阶段 | TS 脚本 | 原始附件 |
+| 练习 | 阶段 | JS/TS 脚本 | 原始附件 |
 | --- | --- | --- | --- |
 | [P3_L10_addm_2023](P3_L10_addm_2023/P3_L10_addm_2023.md) | P3 | [addm.ts](P3_L10_addm_2023/addm.ts) | [addm.class](P3_L10_addm_2023/addm.class) |
 | [P3_L12_lsh_2023](P3_L12_lsh_2023/P3_L12_lsh_2023.md) | P3 | [lsh.ts](P3_L12_lsh_2023/lsh.ts) | [lsh.class](P3_L12_lsh_2023/lsh.class) |

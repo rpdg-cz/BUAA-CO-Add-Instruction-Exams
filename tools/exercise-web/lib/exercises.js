@@ -2,53 +2,88 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  AppError, assertInside, assertDirectory, assertRegularFile, lstat, writeAtomic, moveFile,
+} = require('./store-files');
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/;
-const INSTRUCTION_PATTERN = /^[A-Za-z][A-Za-z0-9_.]{0,39}$/;
+const SCRIPT_NAME_PATTERN = /^[A-Za-z][A-Za-z0-9_.-]{0,39}$/;
 const FILE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/;
-const SCRIPT_EXTENSIONS = new Set(['.ts', '.js', '.mjs', '.cjs']);
 const RESERVED_DIRS = new Set(['tools', 'node_modules']);
+const DEVICE_NAME = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i;
 
-class AppError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.status = status;
-  }
+function isPortableName(name) {
+  return !name.endsWith('.') && !DEVICE_NAME.test(name);
+}
+
+function isScriptFile(name) {
+  return /\.(js|ts)$/.test(name) && !name.endsWith('.d.ts');
+}
+
+function assertScriptFile(name) {
+  if (!isScriptFile(name)) throw new AppError(400, '脚本文件必须使用小写 .js 或 .ts 扩展名，且不能是 .d.ts 声明文件');
+  return name;
 }
 
 function assertExerciseId(id) {
-  if (typeof id !== 'string' || !ID_PATTERN.test(id)) {
+  if (typeof id !== 'string' || !ID_PATTERN.test(id) || !isPortableName(id) || RESERVED_DIRS.has(id.toLowerCase())) {
     throw new AppError(400, '题目 ID 只能包含字母、数字、下划线、点和短横线');
   }
   return id;
 }
 
-function assertInstruction(instruction) {
-  if (typeof instruction !== 'string' || !INSTRUCTION_PATTERN.test(instruction)) {
-    throw new AppError(400, '指令名只能包含字母、数字、下划线和点，且以字母开头');
+function assertScriptName(name) {
+  if (typeof name !== 'string' || !SCRIPT_NAME_PATTERN.test(name) || !isPortableName(name) || /\.(?:ts|js|mjs|cjs)$/i.test(name)) {
+    throw new AppError(400, '脚本文件名只能包含字母、数字、下划线、点和短横线，且以字母开头，不含扩展名');
   }
-  return instruction;
+  return name;
 }
 
 function assertFileName(name) {
-  if (typeof name !== 'string' || !FILE_PATTERN.test(name)) {
+  if (typeof name !== 'string' || !FILE_PATTERN.test(name) || !isPortableName(name)) {
     throw new AppError(400, '文件名不合法');
   }
   return name;
 }
 
-function assertInside(root, target) {
-  const relative = path.relative(root, target);
-  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
-    throw new AppError(400, '路径越界');
+function assertPayload(payload, fields) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new AppError(400, '请求必须是对象');
+  for (const key of Object.keys(payload)) {
+    if (!fields.includes(key)) throw new AppError(400, `不支持的字段：${key}`);
+    if (typeof payload[key] !== 'string') throw new AppError(400, `字段 ${key} 必须是字符串`);
   }
+  if (Object.hasOwn(payload, 'scriptName')) assertScriptName(payload.scriptName);
+  if (Object.hasOwn(payload, 'scriptLanguage') && !['ts', 'js'].includes(payload.scriptLanguage)) {
+    throw new AppError(400, '脚本语言必须为 ts 或 js');
+  }
+}
+
+function exerciseDirectory(root, id, { allowMissing = false } = {}) {
+  assertExerciseId(id);
+  assertDirectory(root);
+  const dir = assertInside(root, path.join(root, id));
+  const existing = fs.readdirSync(root).find((name) => name.toLowerCase() === id.toLowerCase());
+  if (existing && existing !== id) throw new AppError(409, `目录名称大小写不匹配：${existing}`);
+  assertDirectory(dir, { allowMissing });
+  return dir;
+}
+
+function assertFileTarget(dir, name, previousName) {
+  assertFileName(name);
+  const existing = fs.readdirSync(dir).filter((entry) => entry.toLowerCase() === name.toLowerCase());
+  if (existing.some((entry) => entry !== previousName && entry !== name)) {
+    throw new AppError(409, `文件 ${name} 与已有文件重名`);
+  }
+  if (previousName && existing.some((entry) => entry !== previousName)) {
+    throw new AppError(409, `文件 ${name} 已存在`);
+  }
+  const target = assertInside(dir, path.join(dir, name));
+  assertRegularFile(dir, target, { allowMissing: true });
   return target;
 }
 
-function writeAtomic(file, content) {
-  const temp = `${file}.tmp-${process.pid}-${Date.now()}`;
-  fs.writeFileSync(temp, content);
-  fs.renameSync(temp, file);
+function withNewline(text) {
+  return text.endsWith('\n') ? text : `${text}\n`;
 }
 
 function stageOf(id) {
@@ -110,18 +145,21 @@ function readTitle(text, fallback) {
 }
 
 function describeDirectory(root, id) {
-  const dir = path.join(root, id);
+  const dir = exerciseDirectory(root, id);
   const files = fs.readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isFile())
+    .filter((entry) => {
+      if (entry.isSymbolicLink()) throw new AppError(400, `文件 ${entry.name} 不能是链接`);
+      return entry.isFile() && !entry.name.startsWith('.');
+    })
     .map((entry) => {
-      const stat = fs.statSync(path.join(dir, entry.name));
+      const stat = assertRegularFile(dir, path.join(dir, entry.name));
       return { name: entry.name, size: stat.size, modified: stat.mtime.toISOString() };
     })
     .sort((a, b) => (a.name < b.name ? -1 : 1));
 
   const statementFile = files.find((file) => file.name === `${id}.md`) ||
     files.find((file) => file.name.toLowerCase().endsWith('.md'));
-  const scriptFile = files.find((file) => SCRIPT_EXTENSIONS.has(path.extname(file.name).toLowerCase()));
+  const scriptFile = files.find((file) => isScriptFile(file.name));
   const attachments = files.filter((file) => file !== statementFile && file !== scriptFile);
   const statementText = statementFile
     ? fs.readFileSync(path.join(dir, statementFile.name), 'utf8')
@@ -130,7 +168,8 @@ function describeDirectory(root, id) {
   return {
     id,
     stage: stageOf(id),
-    instruction: scriptFile ? path.basename(scriptFile.name, path.extname(scriptFile.name)) : null,
+    scriptName: scriptFile ? path.basename(scriptFile.name, path.extname(scriptFile.name)) : null,
+    scriptLanguage: scriptFile ? path.extname(scriptFile.name).slice(1).toLowerCase() : null,
     title: readTitle(statementText, id),
     source: parseStatementSource(statementText),
     hasStatement: Boolean(statementFile),
@@ -145,10 +184,11 @@ function describeDirectory(root, id) {
 }
 
 function listExerciseIds(root) {
+  assertDirectory(root);
   return fs.readdirSync(root, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    .filter((entry) => entry.isDirectory() && !entry.isSymbolicLink())
     .map((entry) => entry.name)
-    .filter((name) => !name.startsWith('.') && !RESERVED_DIRS.has(name) && ID_PATTERN.test(name))
+    .filter((name) => !name.startsWith('.') && !RESERVED_DIRS.has(name.toLowerCase()) && ID_PATTERN.test(name) && isPortableName(name))
     .filter((name) => {
       const dir = path.join(root, name);
       return fs.readdirSync(dir).some((file) => !file.startsWith('.'));
@@ -162,11 +202,7 @@ function listExercises(root) {
 }
 
 function readExercise(root, id) {
-  assertExerciseId(id);
-  const dir = path.join(root, id);
-  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
-    throw new AppError(404, `题目 ${id} 不存在`);
-  }
+  const dir = exerciseDirectory(root, id);
   const meta = describeDirectory(root, id);
   const statement = meta.statementFile
     ? fs.readFileSync(path.join(dir, meta.statementFile), 'utf8')
@@ -177,7 +213,7 @@ function readExercise(root, id) {
   return { ...meta, statement, script };
 }
 
-function defaultStatement(id, instruction) {
+function defaultStatement(id, scriptFile) {
   return [
     `# ${id}`,
     '',
@@ -195,108 +231,105 @@ function defaultStatement(id, instruction) {
     '',
     '## 说明',
     '',
-    instruction ? `- 指令名：\`${instruction}\`` : '',
+    scriptFile ? `- 脚本文件：\`${scriptFile}\`` : '',
     '',
   ].join('\n');
 }
 
 function createExercise(root, payload) {
+  assertPayload(payload, ['id', 'scriptName', 'scriptLanguage', 'statement', 'script']);
   const id = assertExerciseId(payload.id);
-  const instruction = assertInstruction(payload.instruction);
-  const dir = path.join(root, id);
-  assertInside(root, dir);
-  if (fs.existsSync(dir)) throw new AppError(409, `目录 ${id} 已存在`);
+  const scriptName = assertScriptName(payload.scriptName);
+  if (!['ts', 'js'].includes(payload.scriptLanguage)) throw new AppError(400, '新建题目必须指定脚本语言 ts 或 js');
+  const dir = exerciseDirectory(root, id, { allowMissing: true });
+  if (lstat(dir)) throw new AppError(409, `目录 ${id} 已存在`);
+  const scriptFile = assertScriptFile(`${scriptName}.${payload.scriptLanguage}`);
+  assertFileName(`${id}.md`);
+  assertFileName(scriptFile);
 
-  const statement = typeof payload.statement === 'string' && payload.statement.trim()
+  const statement = payload.statement && payload.statement.trim()
     ? payload.statement
-    : defaultStatement(id, instruction);
-  const script = typeof payload.script === 'string' ? payload.script : '';
+    : defaultStatement(id, scriptFile);
+  const script = payload.script || '';
 
   fs.mkdirSync(dir, { recursive: false });
   writeAtomic(path.join(dir, `${id}.md`), statement.endsWith('\n') ? statement : `${statement}\n`);
-  if (script) writeAtomic(path.join(dir, `${instruction}.ts`), script.endsWith('\n') ? script : `${script}\n`);
+  writeAtomic(path.join(dir, scriptFile), script.endsWith('\n') ? script : `${script}\n`);
   return describeDirectory(root, id);
 }
 
 function updateExercise(root, id, payload) {
-  assertExerciseId(id);
-  const dir = path.join(root, id);
-  assertInside(root, dir);
-  if (!fs.existsSync(dir)) throw new AppError(404, `题目 ${id} 不存在`);
-
+  assertPayload(payload, ['scriptName', 'scriptLanguage', 'statement', 'script']);
+  const dir = exerciseDirectory(root, id);
   const meta = describeDirectory(root, id);
-
-  if (typeof payload.statement === 'string') {
-    const file = path.join(dir, meta.statementFile || `${id}.md`);
-    writeAtomic(file, payload.statement.endsWith('\n') ? payload.statement : `${payload.statement}\n`);
+  if (meta.scriptFile && payload.scriptLanguage && payload.scriptLanguage !== meta.scriptLanguage) {
+    throw new AppError(400, '已有脚本不能修改语言或扩展名');
   }
-
-  if (typeof payload.script === 'string') {
-    const instruction = payload.instruction ? assertInstruction(payload.instruction) : (meta.instruction || 'instruction');
-    const target = path.join(dir, `${instruction}.ts`);
-    if (meta.scriptFile && meta.scriptFile !== `${instruction}.ts`) {
-      const previous = path.join(dir, meta.scriptFile);
-      fs.writeFileSync(target, payload.script.endsWith('\n') ? payload.script : `${payload.script}\n`);
-      fs.unlinkSync(previous);
-    } else {
-      writeAtomic(target, payload.script.endsWith('\n') ? payload.script : `${payload.script}\n`);
-    }
-  } else if (payload.instruction && meta.scriptFile) {
-    const instruction = assertInstruction(payload.instruction);
-    const current = path.join(dir, meta.scriptFile);
-    const renamed = path.join(dir, `${instruction}.ts`);
-    if (current !== renamed) fs.renameSync(current, renamed);
+  const hasScriptContent = Object.hasOwn(payload, 'script');
+  if (!meta.scriptFile && !hasScriptContent && (payload.scriptName || payload.scriptLanguage)) {
+    throw new AppError(400, '新建脚本需要提供脚本内容');
+  }
+  // Validate the entire mutation plan, including collisions and file kinds,
+  // before writing either statement or script.
+  const statementTarget = Object.hasOwn(payload, 'statement')
+    ? assertFileTarget(dir, meta.statementFile || `${id}.md`) : null;
+  let scriptTarget = null;
+  if (hasScriptContent || (payload.scriptName && meta.scriptFile)) {
+    const scriptName = payload.scriptName || meta.scriptName || 'instruction';
+    const extension = meta.scriptFile ? path.extname(meta.scriptFile) : `.${payload.scriptLanguage || 'ts'}`;
+    scriptTarget = assertFileTarget(dir, assertScriptFile(`${scriptName}${extension}`), meta.scriptFile);
+  }
+  if (statementTarget) writeAtomic(statementTarget, withNewline(payload.statement));
+  if (scriptTarget) {
+    const content = hasScriptContent ? withNewline(payload.script) : undefined;
+    if (meta.scriptFile) moveFile(path.join(dir, meta.scriptFile), scriptTarget, content);
+    else writeAtomic(scriptTarget, content);
   }
 
   return describeDirectory(root, id);
 }
 
 function deleteExercise(root, id) {
-  assertExerciseId(id);
-  const dir = path.join(root, id);
-  assertInside(root, dir);
-  if (!fs.existsSync(dir)) throw new AppError(404, `题目 ${id} 不存在`);
+  const dir = exerciseDirectory(root, id);
   const meta = describeDirectory(root, id);
   fs.rmSync(dir, { recursive: true, force: true });
   return meta;
 }
 
 function saveAttachment(root, id, name, buffer) {
-  assertExerciseId(id);
+  const dir = exerciseDirectory(root, id);
   assertFileName(name);
-  const dir = path.join(root, id);
-  assertInside(root, dir);
-  if (!fs.existsSync(dir)) throw new AppError(404, `题目 ${id} 不存在`);
-  writeAtomic(path.join(dir, name), buffer);
+  if (!Buffer.isBuffer(buffer)) throw new AppError(400, '附件内容必须是二进制数据');
+  describeDirectory(root, id);
+  const target = assertFileTarget(dir, name);
+  writeAtomic(target, buffer);
   return describeDirectory(root, id);
 }
 
 function deleteAttachment(root, id, name) {
-  assertExerciseId(id);
+  const dir = exerciseDirectory(root, id);
   assertFileName(name);
-  const dir = path.join(root, id);
-  assertInside(root, dir);
+  describeDirectory(root, id);
   const target = path.join(dir, name);
   assertInside(dir, target);
-  if (!fs.existsSync(target)) throw new AppError(404, `附件 ${name} 不存在`);
+  assertRegularFile(dir, target);
   fs.unlinkSync(target);
   return describeDirectory(root, id);
 }
 
 function readAttachment(root, id, name) {
-  assertExerciseId(id);
+  const dir = exerciseDirectory(root, id);
   assertFileName(name);
-  const dir = path.join(root, id);
   const target = path.join(dir, name);
   assertInside(dir, target);
-  if (!fs.existsSync(target)) throw new AppError(404, `附件 ${name} 不存在`);
+  assertRegularFile(dir, target);
   return target;
 }
 
 module.exports = {
   AppError,
   assertExerciseId,
-  assertInstruction,
+  assertScriptName,
   describeDirectory,
   listExercises,
   readExercise,

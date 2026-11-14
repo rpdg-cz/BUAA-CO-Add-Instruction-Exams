@@ -2,8 +2,8 @@
 
 // Minimal Markdown renderer used to display exercise statements.
 // The statements come from the course platform and mix ordinary Markdown with
-// raw HTML tables, so the renderer keeps HTML blocks untouched and only
-// converts the Markdown constructs that actually appear in this repository.
+// raw HTML tables. This produces HTML, not trusted HTML: the browser must run
+// DOMPurify before inserting the result into the document.
 
 const VOID_TAGS = new Set([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
@@ -23,23 +23,52 @@ function escapeCode(value) {
   return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+function escapeAttribute(value) {
+  return String(value).replace(/&(?!#\d+;|#x[0-9a-fA-F]+;|[a-zA-Z][a-zA-Z0-9]*;)/g, '&amp;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function attachmentUrl(value, options) {
+  if (!options || !options.exerciseId || !Array.isArray(options.files)) return value;
+  const match = /^(?:\.\/)?([^/?#]+)([?#].*)?$/.exec(value);
+  if (!match) return value;
+  let name;
+  try { name = decodeURIComponent(match[1]); } catch (_) { return value; }
+  // Only direct, known ordinary files are attachments. No path resolution or
+  // filesystem lookup occurs in this rendering layer.
+  if (/[\\/:\u0000-\u001f]/.test(name) || name === '.' || name === '..') return value;
+  if (!options.files.some((file) => (typeof file === 'string' ? file : file.name) === name)) return value;
+  return `/api/exercises/${encodeURIComponent(options.exerciseId)}/attachments/${encodeURIComponent(name)}${match[2] || ''}`;
+}
+
+function rewriteHtmlAttachments(html, options) {
+  // The browser's HTML parser and DOMPurify remain the security boundary. This
+  // adapter changes href/src only, leaving unknown or external URLs untouched.
+  return html.replace(/<[^>]+>/g, (tag) => tag.replace(/(\s(?:href|src)\s*=\s*)(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi,
+    (attribute, prefix, double, single, bare) => {
+      const value = double ?? single ?? bare;
+      const rewritten = attachmentUrl(value, options);
+      return rewritten === value ? attribute : `${prefix}"${escapeAttribute(rewritten)}"`;
+    }));
+}
+
 function renderInline(text) {
   const source = String(text);
-  const pieces = source.split(/(`[^`\n]*`)/g);
+  const pieces = source.split(/(`[^`\n]*`|<\/?[a-zA-Z][^>]*>|<!--[\s\S]*?-->)/g);
   let out = '';
   for (let i = 0; i < pieces.length; i += 1) {
     const piece = pieces[i];
     if (i % 2 === 1) {
-      out += `<code>${escapeCode(piece.slice(1, -1))}</code>`;
+      out += piece.startsWith('`') ? `<code>${escapeCode(piece.slice(1, -1))}</code>` : piece;
       continue;
     }
     let html = escapeText(piece);
     // Images before links, both only for inline URLs.
     html = html.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, alt, src) => {
-      return `<img src="${src}" alt="${alt}" loading="lazy">`;
+      return `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}" loading="lazy">`;
     });
     html = html.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, href) => {
-      return `<a href="${href}" target="_blank" rel="noreferrer">${label}</a>`;
+      return `<a href="${escapeAttribute(href)}" target="_blank" rel="noreferrer">${label}</a>`;
     });
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s.,;:!?)]|$)/g, '$1<em>$2</em>');
@@ -105,7 +134,7 @@ function startsBlock(line) {
   );
 }
 
-function renderMarkdown(source) {
+function renderMarkdown(source, options = {}) {
   const lines = String(source == null ? '' : source).replace(/\r\n?/g, '\n').split('\n');
   const out = [];
   let i = 0;
@@ -128,7 +157,7 @@ function renderMarkdown(source) {
         i += 1;
       }
       i += 1;
-      const cls = lang ? ` class="language-${escapeCode(lang)}"` : '';
+      const cls = lang ? ` class="language-${escapeAttribute(lang)}"` : '';
       out.push(`<pre><code${cls}>${escapeCode(buffer.join('\n'))}</code></pre>`);
       continue;
     }
@@ -242,7 +271,7 @@ function renderMarkdown(source) {
     out.push(`<p>${renderInline(paragraph.join(' '))}</p>`);
   }
 
-  return out.join('\n');
+  return rewriteHtmlAttachments(out.join('\n'), options);
 }
 
 module.exports = { renderMarkdown, escapeText, escapeCode };

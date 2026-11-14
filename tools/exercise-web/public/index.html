@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="toolbar">
-      <input id="search" type="search" placeholder="搜索题目 / 指令 / 编号" autocomplete="off">
+      <input id="search" type="search" placeholder="搜索题目 / 脚本 / 编号" autocomplete="off">
       <select id="stageFilter" aria-label="阶段筛选">
         <option value="">全部阶段</option>
       </select>
@@ -57,14 +57,21 @@
           <label>题目 ID
             <input id="fieldId" type="text" placeholder="P5_L6_lbget_2022">
           </label>
-          <label>指令名
-            <input id="fieldInstruction" type="text" placeholder="lbget">
+          <label>脚本文件名（不含扩展名）
+            <input id="fieldScriptName" type="text" placeholder="lbget">
           </label>
         </div>
+        <label>脚本语言（已有脚本保留当前扩展名）
+          <select id="fieldScriptLanguage">
+            <option value="ts">TypeScript (.ts)</option>
+            <option value="js">JavaScript (.js)</option>
+          </select>
+        </label>
+        <p class="form-hint">这里编辑源码和脚本文件名。实际指令助记符以源码中的 mnemonic 定义为准；修改助记符需编辑源码，重命名文件不会更改定义。</p>
         <label>题面（Markdown）
           <textarea id="fieldStatement" rows="10" placeholder="# 标题&#10;&#10;> 项目：P5 ｜ 题目 ID：1050 ｜ 来源 PieId：1338 ｜ 类型：文件上传&#10;&#10;题目描述…"></textarea>
         </label>
-        <label>TS 定义
+        <label>脚本源码（JS / TS）
           <textarea id="fieldScript" rows="10" placeholder="import type { CustomInstructionDefinition } from '@buaa-co/instructions';&#10;…"></textarea>
         </label>
         <label>附件（.class 等，可多选）
@@ -81,6 +88,7 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
+  <script src="/vendor/purify.min.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
