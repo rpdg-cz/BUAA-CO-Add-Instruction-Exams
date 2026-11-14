@@ -1,41 +1,46 @@
 # P6_lhs_2020_blog
 
-> 项目：P6 ｜ 指令：lhs ｜ 年份：2020 ｜ 类型：真题 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p6/)
+> 项目：P6 ｜ 指令：lhs ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p6/)
 >
-> 本题来自博客记录（非官方题面），文字为博主原文或回忆版，缺失字段以“博客未给出”标注。
+> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。
 
-## 编码
+## 题目：偶地址选择并符号扩展一个字节
 
-博客未给出编码（opcode / func）。
+## 编码与汇编格式
 
-## 格式
+博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。
 
-博客未给出。
+语义形式为 `lhs rt, offset(base)`；这是根据来源字段整理的操作数表示，原文未列汇编示例。
 
 ## 描述
 
-> 第三题：lhs
+有效地址由base加符号扩展offset得到。从该地址所在的32位对齐字中，地址低两位为00时取低字节，为10时取bit23..16，将所取字节符号扩展后写入rt；其余两种地址不写回。
 
-$$
-\begin{aligned}
-& Addr \leftarrow GPR[base] + \operatorname{signed\_ext}(offset) \\
-& memword \leftarrow memory[Addr] \\
-& byte \leftarrow Addr_{1..0} \\
-& \operatorname{if}\ byte = 0\ \operatorname{then} \\
-& \qquad GPR[rt] \leftarrow \operatorname{signed\_ext}(memword_{7..0}) \\
-& \operatorname{else}\ \operatorname{if}\ byte = 2\ \operatorname{then} \\
-& \qquad GPR[rt] \leftarrow \operatorname{signed\_ext}(memword_{23..16})
-\end{aligned}
-$$
+## 操作
 
-## 说明
+`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
 
-- 考试形式：P6 上机（Verilog 流水线 CPU 加指令），本次三道题中的第三题（访存类）。
-- 年份：2020（文章发布 2020-12-02）。
-- 博客未给出 opcode 编码与测试点；博主自称 RTL"应该是这样的，记不太清了"。
+```text
+EA ← (GPR[base] + SignExtend(offset)) mod 2^32
+W ← Mem32[EA AND 0xfffffffc]
+if EA[1:0] = 0:
+    GPR[rt] ← SignExtend8To32(W[7:0])
+else if EA[1:0] = 2:
+    GPR[rt] ← SignExtend8To32(W[23:16])
+else:
+    no GPR write
+```
 
-## 出处
+## 边界与异常
 
-- 来源博客：roife（真题）
-- 原始链接：https://roife.github.io/posts/buaa-co-lab-p6/
-- 类型：真题；整理自博客原文，未经课程组核对。
+原文公式取的是8位字节，并不是16位半字；不能按助记符lhs擅自改成lh。奇数地址不写回，是来源条件式及题解共同表达的行为；P6中不引入AdEL异常。
+
+## 课程语义
+
+按课程P6设计要求（本地课程教程：`P6/P6-1.md`），计算类指令不因算术溢出产生异常；应保持课程流水线、转发/暂停及乘除模块的相关规则。控制转移继承课程P5（本地课程教程：`P5/project/P5-5-1.md`）的一条延迟槽，链接使用本指令PC+8。本题未记录的特殊异常、固定总周期门限或额外输入保证不能自行添加。
+
+## 出处与资料缺项
+
+- 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p6/)。
+- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。
+- offset明确要求符号扩展，但位域宽度和opcode未记录；本文不分配编码。

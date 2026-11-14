@@ -1,16 +1,15 @@
 # P5_lrm_2020_blog — 题解
 
-> 项目：P5 ｜ 指令：lrm ｜ 年份：2020 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
+> 项目：P5 ｜ 指令：lrm ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
 
-## 题解
+本文是实现分析，与题面分开；来源中的做法不代表唯一实现。
 
-> 存储地址为 DM 输出的低位。
+## 实现分析
 
-即写入地址取自 DM 读出值的低 5 位（`Memory[vAddr]_{4..0}` 作为 GRF 写地址），属于"写入目标完全取决于 DM 读取值"的条件存储类型。该博主在"上机总结 3 & 分析"中给出的 stall 写法：
+新目的编号直到内存读数产生后才确定，写入数据则是 `rt` 的旧值。冒险处理须覆盖可能的非零目的寄存器，并且不能在编号和数据尚未确定时进行错误转发；不要逐字套用原博客里带具体信号名的 stall 示例。
 
-```verilog
-// lrm
-wire stall_rs_e = (TuseRS < TnewE) && D_rs_addr && (D_lrm ? D_rs_addr : D_rs_addr == E_RFDst);
-```
+## 资料说明
 
-> 题解为博客作者原文或整理，仅供参考，不代表唯一解法。
+[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
+
+实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。

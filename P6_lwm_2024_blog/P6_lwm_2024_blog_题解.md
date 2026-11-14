@@ -1,23 +1,13 @@
 # P6_lwm_2024_blog — 题解
 
-> 项目：P6 ｜ 指令：lwm ｜ 年份：2024 ｜ 来源：[jiangshiyi](https://jiangshiyi0822.github.io/2024/12/16/BUAA-CO-P6习题分析/)
+> 项目：P6 ｜ 指令：lwm ｜ 年份：2024（博客发表年份，未明确原题届次） ｜ 类型：博客整理 ｜ 来源：[jiangshiyi](https://jiangshiyi0822.github.io/2024/12/16/BUAA-CO-P6习题分析/)
 
-## 题解
+## 解题思路
 
-- 控制信号：`RegWrite=1`、`MemRead=1`、`MemtoReg=1`、`word_DEin=1`、`EXTOp=2'b01`。
-- 冒险："写回地址在 M 级由 `WD - GRF[rt]` 决定"，博客给 `Tuse_RS=1`、`Tuse_RT=2`、`Tnew_DEin=3`，并做 E/M 级定向阻塞：
+rs/base参与地址计算，旧rt参与目的编号计算，二者实际使用时间可能不同。目的编号未知时需保守考虑所有非零编号；M级算出D后应按真实编号处理，避免持续全局暂停。
 
-```verilog
-// E级
-stall_E = (isLwm_DEout === 1) ? 1 : 0;
-// M级
-stall_M = (isLwm_EMout === 1 && RegAddr_MWin !== 5'b0
-           && (RegAddr_MWin === rs_DEin || RegAddr_WMin === rt_DEin)) ? 1 : 0;
+## 实现核对
 
-wire [31:0] lwm_sub = WD - A2_MWin;
-RegAddr_MWin = (isLwm_EMout === 1) ? lwm_sub[4:0] : RegAddr_EMout;
-```
+以[题面](P6_lwm_2024_blog.md)中的RTL为功能核对依据。源操作数取本指令执行前的状态，0号寄存器不接收写回；控制与目的编号须跟随产生它们的指令流水。不同实现可以选择不同流水级，只要冒险处理和最终可见行为符合题意。
 
-- 注意 `RegAddr_MWin === 5'b0` 的排除：若算出的地址是 0 号寄存器，不写/不必阻塞。
-
-> 题解为博客作者原文或整理，仅供参考，不代表唯一解法。
+此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。

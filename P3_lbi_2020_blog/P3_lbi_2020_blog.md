@@ -1,40 +1,46 @@
 # P3_lbi_2020_blog
 
-> 项目：P3 ｜ 指令：lbi ｜ 年份：2020 ｜ 类型：真题 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p3/)
->
-> 本题来自博客记录（非官方题面），文字为博主原文或回忆版，缺失字段以“博客未给出”标注。
+> 项目：P3 ｜ 指令：lbi ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p3/)
 
-## 编码
+本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。
 
-博客未给出编码（opcode / func）。
+## 题目：按地址选择字节并原位写回
 
-## 格式
+## 编码与格式
 
-博客未给出。
+opcode 及完整编码未记录。RTL 使用 `base`、`offset` 和 `rt`。
+
+汇编语法未记录；`base` 是基址寄存器编号，`offset` 是符号扩展的偏移字段。
 
 ## 描述
 
-> 第三题：lbi
->
-> 一个很像 lb 的指令，唯一的区别在于需要用到存储器，需要稍微修改一下数据通路。
+读取有效地址所在的内存字，依据地址低两位选取其中一个字节，将该字节写入 `rt` 的相同字节位置，保留其余三字节。
 
-$$
-\begin{aligned}
-& Addr \leftarrow GPR[base] + \mathtt{sign\_ext}(offset) \\
-& mem \leftarrow memory[Addr] \\
-& byte \leftarrow Addr_{1..0} \\
-& GPR[rt]_{7+8*byte..8*byte} \leftarrow mem_{7+8*byte..8*byte}
-\end{aligned}
-$$
+## 操作
 
-## 说明
+`GPR[n]` 是 32 位寄存器位串，位编号从最低位 0 到最高位 31；`x[h:l]` 包含两端，`||` 表示高位在左的拼接。`S32(x)` 表示将 32 位位串按二进制补码解释；`SEXT32(x)` 表示按原字段最高位符号扩展到 32 位。涉及 PC 时，`P0` 固定指本指令的地址，所有右侧源寄存器均取本指令执行前的值。课程规定的普通 32 位加减法保留低 32 位，不因溢出触发异常；本题显式给出更宽运算或溢出检测时按本题执行。写入 0 号寄存器不改变其恒零状态。
 
-- 考试形式：P3 上机（Logisim 单周期 CPU 加指令），本次三道题中的第三题（访存类）。
-- 年份：2020（文章发布 2020-11-15）。
-- 博客未给出 opcode 编码与测试点；RTL 中 `GPR[base]` 即 rs 域。
+```text
+Addr ← low32(GPR[base] + SEXT32(offset))
+mem ← MemoryWordContaining(Addr)
+b ← unsigned(Addr[1:0])
+result ← old(GPR[rt])
+result[8*b+7 : 8*b] ← mem[8*b+7 : 8*b]
+GPR[rt] ← result
+```
 
-## 出处
+## 边界条件
 
-- 来源博客：roife（真题）
-- 原始链接：https://roife.github.io/posts/buaa-co-lab-p3/
-- 类型：真题；整理自博客原文，未经课程组核对。
+`b` 取 0、1、2、3，分别选择位段 `[7:0]`、`[15:8]`、`[23:16]`、`[31:24]`。不是把字节扩展为 32 位；源字节为 `0x80` 也只覆盖对应 8 位。
+
+## 课程阶段注意
+
+P3 为 Logisim 单周期 CPU，无分支延迟槽。
+
+原文 `memory[Addr]` 按课程按字组织的 DM 读出字理解；字节位置由 `Addr[1:0]` 明确选择，不跨字读写。执行后至 `P0+4`。
+
+## 出处与资料缺项
+
+[roife](https://roife.github.io/posts/buaa-co-lab-p3/)
+
+原文没有列出 offset 位宽、访存越界处置或测试集；只对课程有效 DM 地址的操作作上述整理。

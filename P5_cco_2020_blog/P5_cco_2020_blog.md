@@ -1,42 +1,45 @@
 # P5_cco_2020_blog
 
-> 项目：P5 ｜ 指令：cco ｜ 年份：2020 ｜ 类型：真题 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
->
-> 本题来自博客记录（非官方题面），文字为博主原文或回忆版，缺失字段以“博客未给出”标注。
+> 项目：P5 ｜ 指令：cco ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
 
-## 编码
+本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。
 
-博客未给出编码（opcode / func）。
+## 题目：统计两个寄存器同时为一的位数
 
-## 格式
+## 编码与格式
 
-博客未给出。
+opcode/funct 及完整编码未记录。
+
+汇编语法未记录；源为 `rs`、`rt`，目的为 `rd`。
 
 ## 描述
 
-> 上机总结 1
->
-> 第一题：cco
+统计两个源寄存器在相同位号上均为 1 的位置数量，将计数作为 32 位非负整数写回 `rd`。
 
-$$
-\begin{aligned}
-& temp \leftarrow 0 \\
-& \operatorname{for}\ i\ \operatorname{in}\ 31 \cdots 0 \\
-& \qquad \operatorname{if}\ GPR[rs]_i == 1\ \operatorname{and}\ GPR[rt]_i == 1\ \operatorname{then} \\
-& \qquad \qquad temp \leftarrow temp + 1 \\
-& GPR[rd] \leftarrow temp
-\end{aligned}
-$$
+## 操作
 
-## 说明
+`GPR[n]` 是 32 位寄存器位串，位编号从最低位 0 到最高位 31；`x[h:l]` 包含两端，`||` 表示高位在左的拼接。`S32(x)` 表示将 32 位位串按二进制补码解释；`SEXT32(x)` 表示按原字段最高位符号扩展到 32 位。涉及 PC 时，`P0` 固定指本指令的地址，所有右侧源寄存器均取本指令执行前的值。课程规定的普通 32 位加减法保留低 32 位，不因溢出触发异常；本题显式给出更宽运算或溢出检测时按本题执行。写入 0 号寄存器不改变其恒零状态。
 
-- 考试形式：P5 上机（Verilog 流水线 CPU 加指令）。本次三道题为"计算 + 跳转 + 存储"，本文件记录第一题（计算类）。
-- 场次：出自该博主 **P5 第一次上机（"上机总结 1"，当次未通过）**。
-- 年份：2020（文章发布 2020-11-23；博主 2020 级，CO 2020 年秋）。
-- 博客未给出 opcode/funct 编码与测试点。
+```text
+count ← 0
+for i = 0..31:
+    if GPR[rs][i] = 1 and GPR[rt][i] = 1:
+        count ← count + 1
+GPR[rd] ← zero_extend_32(count)
+```
 
-## 出处
+## 边界条件
 
-- 来源博客：roife（真题）
-- 原始链接：https://roife.github.io/posts/buaa-co-lab-p5/
-- 类型：真题；整理自博客原文，未经课程组核对。
+结果范围为 0 至 32。全零结果为 0；两源全为 `0xFFFFFFFF` 时结果为 32。符号位同等参与计数，不涉及有符号比较。
+
+## 课程阶段注意
+
+P5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。
+
+非转移指令，按程序顺序执行。
+
+## 出处与资料缺项
+
+[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
+
+来源为该作者 P5 第一次上机的第一题；缺编码不影响上述行为的还原。

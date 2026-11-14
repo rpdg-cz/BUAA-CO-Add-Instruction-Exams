@@ -1,30 +1,15 @@
 # Pre_Verilog按位相乘后统计1的个数_2024_blog — 题解
 
-> 项目：Pre ｜ 年份：2024 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/23/CO/BUAA-CO-pre/)
+> 项目：Pre ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/23/CO/BUAA-CO-pre/)
 
-## 题解
+> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。
 
-> 由于是二进制，按位乘其实就是按位 and，之后用 for 循环统计结果中的 1，然后输出即可。
+## 解题思路
 
-```verilog
-module ans(
-    input  [31:0] vector_a,
-    input  [31:0] vector_b,
-    output [5:0]  answer
-);
-    reg [31:0] temp;
-    reg [5:0]  cnt;
-    always @(*) begin
-        cnt  = 0;
-        temp = vector_a & vector_b;
-        for (i = 0; i < 32; i = i + 1) begin
-            if (temp[i] == 1) cnt = cnt + 1;
-        end
-    end
-    assign answer = cnt;
-endmodule
-```
+二进制一位相乘等价于按位与，先得到 `p=vector_a & vector_b`，再计算 p 中 1 的数量。按位与使用 `&`，逻辑与 `&&` 只给出一个逻辑结果，不符合本题。
 
-- 博客提醒的坑：`&` 是按位与（`&&` 是逻辑与、`and` 是门级原语）；Verilog 的整型变量要写 `integer` 而不是 `int`；`answer` 要么声明成 `reg`，要么另设临时 `reg cnt`；寄存器要初始化。
+组合 always @(*) 中先将 6 位计数变量清零，再用 integer 循环变量遍历 32 位，以阻塞赋值累计，最后驱动 answer。原博客示例未声明 i，实际代码须补上 `integer i;`。组合块内的默认赋值用于每次完整计算，不需要增加 initial 或时钟。
 
-> 题解为博客作者原文或整理，仅供参考，不代表唯一解法。
+## 自查
+
+任一输入全为 0 时答案为 0；两者全为 1 时为 32；互补向量逐位乘积全为 0。不要使用两个 32 位整数的乘法来替代逐位乘。

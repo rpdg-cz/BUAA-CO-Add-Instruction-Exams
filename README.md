@@ -1,5 +1,7 @@
 # 加指令练习
 
+本仓库收录课程题库和往届博客材料。下方 JS/TS 运行说明适用于实际附有脚本的课程加指令题；博客条目只提供整理后的题面及题解，不自动生成指令编码、脚本或 Java 附件。P0/P1 的电路与状态机、P2 的汇编算法题按各自阶段实现，不能作为 CPU 自定义指令直接加载。
+
 ## 在 BUAA CO Toolkit 中使用 TS 脚本
 
 需要 **VS Code 1.101 或更新版本**，以及已包含 JS/TS 自定义指令功能的 [BUAA CO Toolkit](https://github.com/stone926/BUAA-CO-Toolkit)。脚本由插件调用 VS Code 自带的运行时加载，无需额外安装 Node、npm 包、`tsc` 或 MARS。
@@ -112,37 +114,134 @@ node tools/exercise-web/server.js
 
 <!-- Exercise table generated from the verified fixture index. -->
 
-| 练习 | 阶段 | JS/TS 脚本 | 原始附件 |
-| --- | --- | --- | --- |
-| [P3_L10_addm_2023](P3_L10_addm_2023/P3_L10_addm_2023.md) | P3 | [addm.ts](P3_L10_addm_2023/addm.ts) | [addm.class](P3_L10_addm_2023/addm.class) |
-| [P3_L12_lsh_2023](P3_L12_lsh_2023/P3_L12_lsh_2023.md) | P3 | [lsh.ts](P3_L12_lsh_2023/lsh.ts) | [lsh.class](P3_L12_lsh_2023/lsh.class) |
-| [P3_L15_bomez_2023](P3_L15_bomez_2023/P3_L15_bomez_2023.md) | P3 | [bomez.ts](P3_L15_bomez_2023/bomez.ts) | [bomez.class](P3_L15_bomez_2023/bomez.class) |
-| [P3_L16_lboez_2023](P3_L16_lboez_2023/P3_L16_lboez_2023.md) | P3 | [lboez.ts](P3_L16_lboez_2023/lboez.ts) | [lboez.class](P3_L16_lboez_2023/lboez.class) |
-| [P4_L1_RLB_2022](P4_L1_RLB_2022/P4_L1_RLB_2022.md) | P4 | [rlb.ts](P4_L1_RLB_2022/rlb.ts) | [rlb.class](P4_L1_RLB_2022/rlb.class) |
-| [P4_L2_BOMEZ_2022](P4_L2_BOMEZ_2022/P4_L2_BOMEZ_2022.md) | P4 | [bomez.ts](P4_L2_BOMEZ_2022/bomez.ts) | [bomez.class](P4_L2_BOMEZ_2022/bomez.class) |
-| [P4_L3_LWRR_2022](P4_L3_LWRR_2022/P4_L3_LWRR_2022.md) | P4 | [lwrr.ts](P4_L3_LWRR_2022/lwrr.ts) | [lwrr.class](P4_L3_LWRR_2022/lwrr.class) |
-| [P4_L4_PCADD_2022](P4_L4_PCADD_2022/P4_L4_PCADD_2022.md) | P4 | [pcadd.ts](P4_L4_PCADD_2022/pcadd.ts) | [pcadd.class](P4_L4_PCADD_2022/pcadd.class) |
-| [P4_L4_SSZE_2022](P4_L4_SSZE_2022/P4_L4_SSZE_2022.md) | P4 | [ssze.ts](P4_L4_SSZE_2022/ssze.ts) | [ssze.class](P4_L4_SSZE_2022/ssze.class) |
-| [P4_L5_BNEZALC_2022](P4_L5_BNEZALC_2022/P4_L5_BNEZALC_2022.md) | P4 | [bnezalc.ts](P4_L5_BNEZALC_2022/bnezalc.ts) | [bnezalc.class](P4_L5_BNEZALC_2022/bnezalc.class) |
-| [P4_L5_sbsam_2023](P4_L5_sbsam_2023/P4_L5_sbsam_2023.md) | P4 | [sbsam.ts](P4_L5_sbsam_2023/sbsam.ts) | [sbsam.class](P4_L5_sbsam_2023/sbsam.class) |
-| [P4_L6_LBOEZ_2022](P4_L6_LBOEZ_2022/P4_L6_LBOEZ_2022.md) | P4 | [lboez.ts](P4_L6_LBOEZ_2022/lboez.ts) | [lboez.class](P4_L6_LBOEZ_2022/lboez.class) |
-| [P4_L7_TFTC_2022](P4_L7_TFTC_2022/P4_L7_TFTC_2022.md) | P4 | [tftc.ts](P4_L7_TFTC_2022/tftc.ts) | [tftc.class](P4_L7_TFTC_2022/tftc.class) |
-| [P4_L8_SB_2022](P4_L8_SB_2022/P4_L8_SB_2022.md) | P4 | [sb.ts](P4_L8_SB_2022/sb.ts) | 无 |
-| [P4_L9_BAO_2022](P4_L9_BAO_2022/P4_L9_BAO_2022.md) | P4 | [bao.ts](P4_L9_BAO_2022/bao.ts) | [bao.class](P4_L9_BAO_2022/bao.class) |
-| [P4_L9_ras_2023](P4_L9_ras_2023/P4_L9_ras_2023.md) | P4 | [ras.ts](P4_L9_ras_2023/ras.ts) | [ras.class](P4_L9_ras_2023/ras.class) |
-| [P4_L10_pcadd_2023](P4_L10_pcadd_2023/P4_L10_pcadd_2023.md) | P4 | [pcadd.ts](P4_L10_pcadd_2023/pcadd.ts) | [pcadd.class](P4_L10_pcadd_2023/pcadd.class) |
-| [P5_L2_bonall_2022](P5_L2_bonall_2022/P5_L2_bonall_2022.md) | P5 | [bonall.ts](P5_L2_bonall_2022/bonall.ts) | [bonall.class](P5_L2_bonall_2022/bonall.class) |
-| [P5_L3_blztal_2022](P5_L3_blztal_2022/P5_L3_blztal_2022.md) | P5 | [blztal.ts](P5_L3_blztal_2022/blztal.ts) | [blztal.class](P5_L3_blztal_2022/blztal.class) |
-| [P5_L4_addei_2022](P5_L4_addei_2022/P5_L4_addei_2022.md) | P5 | [addei.ts](P5_L4_addei_2022/addei.ts) | [addei.class](P5_L4_addei_2022/addei.class) |
-| [P5_L5_lhogez_2022](P5_L5_lhogez_2022/P5_L5_lhogez_2022.md) | P5 | [lhogez.ts](P5_L5_lhogez_2022/lhogez.ts) | [lhogez.class](P5_L5_lhogez_2022/lhogez.class) |
-| [P5_L6_lbget_2022](P5_L6_lbget_2022/P5_L6_lbget_2022.md) | P5 | [lbget.ts](P5_L6_lbget_2022/lbget.ts) | [lbget.class](P5_L6_lbget_2022/lbget.class) |
-| [P5_M_lwer_2022](P5_M_lwer_2022/P5_M_lwer_2022.md) | P5 | [lwer.ts](P5_M_lwer_2022/lwer.ts) | 无 |
+| 练习 | 阶段 | 状态 | 来源 | JS/TS 脚本 | 附件 |
+| --- | --- | --- | --- | --- | --- |
+| [Pre_LogisimFSM_2024_blog](incomplete/Pre_LogisimFSM_2024_blog/Pre_LogisimFSM_2024_blog.md) | Pre | 残题 | 博客整理 | 无 | [Pre_LogisimFSM_2024_blog_题解.md](incomplete/Pre_LogisimFSM_2024_blog/Pre_LogisimFSM_2024_blog_题解.md) |
+| [Pre_Verilog按位相乘后统计1的个数_2024_blog](Pre_Verilog按位相乘后统计1的个数_2024_blog/Pre_Verilog按位相乘后统计1的个数_2024_blog.md) | Pre | 行为完整 | 博客整理 | 无 | [Pre_Verilog按位相乘后统计1的个数_2024_blog_题解.md](Pre_Verilog按位相乘后统计1的个数_2024_blog/Pre_Verilog按位相乘后统计1的个数_2024_blog_题解.md) |
+| [Pre_三题概述_2023_blog](incomplete/Pre_三题概述_2023_blog/Pre_三题概述_2023_blog.md) | Pre | 残题 | 博客整理 | 无 | 无 |
+| [Pre_字符自动机_2021_blog](incomplete/Pre_字符自动机_2021_blog/Pre_字符自动机_2021_blog.md) | Pre | 残题 | 博客整理 | 无 | [Pre_字符自动机_2021_blog_题解.md](incomplete/Pre_字符自动机_2021_blog/Pre_字符自动机_2021_blog_题解.md) |
+| [P0_MD5前处理电路_2020_blog](incomplete/P0_MD5前处理电路_2020_blog/P0_MD5前处理电路_2020_blog.md) | P0 | 残题 | 博客整理 | 无 | [P0_MD5前处理电路_2020_blog_题解.md](incomplete/P0_MD5前处理电路_2020_blog/P0_MD5前处理电路_2020_blog_题解.md) |
+| [P0_三元递推式求项_2021_blog](P0_三元递推式求项_2021_blog/P0_三元递推式求项_2021_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_三元递推式求项_2021_blog_题解.md](P0_三元递推式求项_2021_blog/P0_三元递推式求项_2021_blog_题解.md) |
+| [P0_三数求和组合电路_2020_blog](P0_三数求和组合电路_2020_blog/P0_三数求和组合电路_2020_blog.md) | P0 | 行为完整 | 博客整理 | 无 | 无 |
+| [P0_字符自动机_2021_blog](incomplete/P0_字符自动机_2021_blog/P0_字符自动机_2021_blog.md) | P0 | 残题 | 博客整理 | 无 | [P0_字符自动机_2021_blog_题解.md](incomplete/P0_字符自动机_2021_blog/P0_字符自动机_2021_blog_题解.md) |
+| [P0_序列检测Moore状态机_2023_blog](P0_序列检测Moore状态机_2023_blog/P0_序列检测Moore状态机_2023_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_序列检测Moore状态机_2023_blog_题解.md](P0_序列检测Moore状态机_2023_blog/P0_序列检测Moore状态机_2023_blog_题解.md) |
+| [P0_打分求和电路_2020_blog](P0_打分求和电路_2020_blog/P0_打分求和电路_2020_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_打分求和电路_2020_blog_题解.md](P0_打分求和电路_2020_blog/P0_打分求和电路_2020_blog_题解.md) |
+| [P0_投票表决器_2021_blog](P0_投票表决器_2021_blog/P0_投票表决器_2021_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_投票表决器_2021_blog_题解.md](P0_投票表决器_2021_blog/P0_投票表决器_2021_blog_题解.md) |
+| [P0_摆渡车换乘状态机_2020_blog](incomplete/P0_摆渡车换乘状态机_2020_blog/P0_摆渡车换乘状态机_2020_blog.md) | P0 | 残题 | 博客整理 | 无 | 无 |
+| [P0_方向信号Mealy状态机_2023_blog](P0_方向信号Mealy状态机_2023_blog/P0_方向信号Mealy状态机_2023_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_方向信号Mealy状态机_2023_blog_题解.md](P0_方向信号Mealy状态机_2023_blog/P0_方向信号Mealy状态机_2023_blog_题解.md) |
+| [P0_最长不降后缀串_2024_blog](incomplete/P0_最长不降后缀串_2024_blog/P0_最长不降后缀串_2024_blog.md) | P0 | 残题 | 博客整理 | 无 | [P0_最长不降后缀串_2024_blog_题解.md](incomplete/P0_最长不降后缀串_2024_blog/P0_最长不降后缀串_2024_blog_题解.md) |
+| [P0_未出现的最小正整数_2023_blog](P0_未出现的最小正整数_2023_blog/P0_未出现的最小正整数_2023_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_未出现的最小正整数_2023_blog_题解.md](P0_未出现的最小正整数_2023_blog/P0_未出现的最小正整数_2023_blog_题解.md) |
+| [P0_自习室人数统计_2024_blog](incomplete/P0_自习室人数统计_2024_blog/P0_自习室人数统计_2024_blog.md) | P0 | 残题 | 博客整理 | 无 | [P0_自习室人数统计_2024_blog_题解.md](incomplete/P0_自习室人数统计_2024_blog/P0_自习室人数统计_2024_blog_题解.md) |
+| [P0_逆序数对_2024_blog](P0_逆序数对_2024_blog/P0_逆序数对_2024_blog.md) | P0 | 行为完整 | 博客整理 | 无 | [P0_逆序数对_2024_blog_题解.md](P0_逆序数对_2024_blog/P0_逆序数对_2024_blog_题解.md) |
+| [P1_numberNest数字匹配合法性判定_2023_blog](incomplete/P1_numberNest数字匹配合法性判定_2023_blog/P1_numberNest数字匹配合法性判定_2023_blog.md) | P1 | 残题 | 博客整理 | 无 | [P1_numberNest数字匹配合法性判定_2023_blog_题解.md](incomplete/P1_numberNest数字匹配合法性判定_2023_blog/P1_numberNest数字匹配合法性判定_2023_blog_题解.md) |
+| [P1_加权投票计分_2020_blog](P1_加权投票计分_2020_blog/P1_加权投票计分_2020_blog.md) | P1 | 行为完整 | 博客整理 | 无 | [P1_加权投票计分_2020_blog_题解.md](P1_加权投票计分_2020_blog/P1_加权投票计分_2020_blog_题解.md) |
+| [P1_奇偶交替串判定_2024_blog](P1_奇偶交替串判定_2024_blog/P1_奇偶交替串判定_2024_blog.md) | P1 | 行为完整 | 博客整理 | 无 | [P1_奇偶交替串判定_2024_blog_题解.md](P1_奇偶交替串判定_2024_blog/P1_奇偶交替串判定_2024_blog_题解.md) |
+| [P1_心情状态机_2021_blog](incomplete/P1_心情状态机_2021_blog/P1_心情状态机_2021_blog.md) | P1 | 残题 | 博客整理 | 无 | [P1_心情状态机_2021_blog_题解.md](incomplete/P1_心情状态机_2021_blog/P1_心情状态机_2021_blog_题解.md) |
+| [P1_日期串合法性状态机_2020_blog](incomplete/P1_日期串合法性状态机_2020_blog/P1_日期串合法性状态机_2020_blog.md) | P1 | 残题 | 博客整理 | 无 | [P1_日期串合法性状态机_2020_blog_题解.md](incomplete/P1_日期串合法性状态机_2020_blog/P1_日期串合法性状态机_2020_blog_题解.md) |
+| [P1_煎饼翻面状态机_2020_blog](incomplete/P1_煎饼翻面状态机_2020_blog/P1_煎饼翻面状态机_2020_blog.md) | P1 | 残题 | 博客整理 | 无 | [P1_煎饼翻面状态机_2020_blog_题解.md](incomplete/P1_煎饼翻面状态机_2020_blog/P1_煎饼翻面状态机_2020_blog_题解.md) |
+| [P1_逐位统计不同_2024_blog](P1_逐位统计不同_2024_blog/P1_逐位统计不同_2024_blog.md) | P1 | 行为完整 | 博客整理 | 无 | [P1_逐位统计不同_2024_blog_题解.md](P1_逐位统计不同_2024_blog/P1_逐位统计不同_2024_blog_题解.md) |
+| [P1_键值对个数_2024_blog](incomplete/P1_键值对个数_2024_blog/P1_键值对个数_2024_blog.md) | P1 | 残题 | 博客整理 | 无 | [P1_键值对个数_2024_blog_题解.md](incomplete/P1_键值对个数_2024_blog/P1_键值对个数_2024_blog_题解.md) |
+| [P2_三道汇编题_2020_blog](incomplete/P2_三道汇编题_2020_blog/P2_三道汇编题_2020_blog.md) | P2 | 残题 | 博客整理 | 无 | [P2_三道汇编题_2020_blog_题解.md](incomplete/P2_三道汇编题_2020_blog/P2_三道汇编题_2020_blog_题解.md) |
+| [P2_删数使剩余最大_2021_blog](P2_删数使剩余最大_2021_blog/P2_删数使剩余最大_2021_blog.md) | P2 | 行为完整 | 博客整理 | 无 | [P2_删数使剩余最大_2021_blog_题解.md](P2_删数使剩余最大_2021_blog/P2_删数使剩余最大_2021_blog_题解.md) |
+| [P2_双关键字排序_2021_blog](incomplete/P2_双关键字排序_2021_blog/P2_双关键字排序_2021_blog.md) | P2 | 残题 | 博客整理 | 无 | 无 |
+| [P2_合并有序数组_2023_blog](P2_合并有序数组_2023_blog/P2_合并有序数组_2023_blog.md) | P2 | 行为完整 | 博客整理 | 无 | [P2_合并有序数组_2023_blog_题解.md](P2_合并有序数组_2023_blog/P2_合并有序数组_2023_blog_题解.md) |
+| [P2_拆分数字_2021_blog](incomplete/P2_拆分数字_2021_blog/P2_拆分数字_2021_blog.md) | P2 | 残题 | 博客整理 | 无 | [P2_拆分数字_2021_blog_题解.md](incomplete/P2_拆分数字_2021_blog/P2_拆分数字_2021_blog_题解.md) |
+| [P2_消除游戏_2023_blog](P2_消除游戏_2023_blog/P2_消除游戏_2023_blog.md) | P2 | 行为完整 | 博客整理 | 无 | [P2_消除游戏_2023_blog_题解.md](P2_消除游戏_2023_blog/P2_消除游戏_2023_blog_题解.md) |
+| [P3_L10_addm_2023](P3_L10_addm_2023/P3_L10_addm_2023.md) | P3 | 行为完整 | 课程题库 | [addm.ts](P3_L10_addm_2023/addm.ts) | [addm.class](P3_L10_addm_2023/addm.class) |
+| [P3_L12_lsh_2023](P3_L12_lsh_2023/P3_L12_lsh_2023.md) | P3 | 行为完整 | 课程题库 | [lsh.ts](P3_L12_lsh_2023/lsh.ts) | [lsh.class](P3_L12_lsh_2023/lsh.class) |
+| [P3_L15_bomez_2023](P3_L15_bomez_2023/P3_L15_bomez_2023.md) | P3 | 行为完整 | 课程题库 | [bomez.ts](P3_L15_bomez_2023/bomez.ts) | [bomez.class](P3_L15_bomez_2023/bomez.class) |
+| [P3_L16_lboez_2023](P3_L16_lboez_2023/P3_L16_lboez_2023.md) | P3 | 行为完整 | 课程题库 | [lboez.ts](P3_L16_lboez_2023/lboez.ts) | [lboez.class](P3_L16_lboez_2023/lboez.class) |
+| [P3_Gray_code_2024_blog](incomplete/P3_Gray_code_2024_blog/P3_Gray_code_2024_blog.md) | P3 | 残题 | 博客整理 | 无 | [P3_Gray_code_2024_blog_题解.md](incomplete/P3_Gray_code_2024_blog/P3_Gray_code_2024_blog_题解.md) |
+| [P3_balr_2020_blog](P3_balr_2020_blog/P3_balr_2020_blog.md) | P3 | 行为完整 | 博客整理 | 无 | [P3_balr_2020_blog_题解.md](P3_balr_2020_blog/P3_balr_2020_blog_题解.md) |
+| [P3_lbi_2020_blog](P3_lbi_2020_blog/P3_lbi_2020_blog.md) | P3 | 行为完整 | 博客整理 | 无 | [P3_lbi_2020_blog_题解.md](P3_lbi_2020_blog/P3_lbi_2020_blog_题解.md) |
+| [P3_wsbh_2020_blog](P3_wsbh_2020_blog/P3_wsbh_2020_blog.md) | P3 | 行为完整 | 博客整理 | 无 | [P3_wsbh_2020_blog_题解.md](P3_wsbh_2020_blog/P3_wsbh_2020_blog_题解.md) |
+| [P4_L1_RLB_2022](P4_L1_RLB_2022/P4_L1_RLB_2022.md) | P4 | 行为完整 | 课程题库 | [rlb.ts](P4_L1_RLB_2022/rlb.ts) | [rlb.class](P4_L1_RLB_2022/rlb.class) |
+| [P4_L2_BOMEZ_2022](P4_L2_BOMEZ_2022/P4_L2_BOMEZ_2022.md) | P4 | 行为完整 | 课程题库 | [bomez.ts](P4_L2_BOMEZ_2022/bomez.ts) | [bomez.class](P4_L2_BOMEZ_2022/bomez.class) |
+| [P4_L3_LWRR_2022](P4_L3_LWRR_2022/P4_L3_LWRR_2022.md) | P4 | 行为完整 | 课程题库 | [lwrr.ts](P4_L3_LWRR_2022/lwrr.ts) | [lwrr.class](P4_L3_LWRR_2022/lwrr.class) |
+| [P4_L4_PCADD_2022](P4_L4_PCADD_2022/P4_L4_PCADD_2022.md) | P4 | 行为完整 | 课程题库 | [pcadd.ts](P4_L4_PCADD_2022/pcadd.ts) | [pcadd.class](P4_L4_PCADD_2022/pcadd.class) |
+| [P4_L4_SSZE_2022](P4_L4_SSZE_2022/P4_L4_SSZE_2022.md) | P4 | 行为完整 | 课程题库 | [ssze.ts](P4_L4_SSZE_2022/ssze.ts) | [ssze.class](P4_L4_SSZE_2022/ssze.class) |
+| [P4_L5_BNEZALC_2022](P4_L5_BNEZALC_2022/P4_L5_BNEZALC_2022.md) | P4 | 行为完整 | 课程题库 | [bnezalc.ts](P4_L5_BNEZALC_2022/bnezalc.ts) | [bnezalc.class](P4_L5_BNEZALC_2022/bnezalc.class) |
+| [P4_L5_sbsam_2023](P4_L5_sbsam_2023/P4_L5_sbsam_2023.md) | P4 | 行为完整 | 课程题库 | [sbsam.ts](P4_L5_sbsam_2023/sbsam.ts) | [sbsam.class](P4_L5_sbsam_2023/sbsam.class) |
+| [P4_L6_LBOEZ_2022](P4_L6_LBOEZ_2022/P4_L6_LBOEZ_2022.md) | P4 | 行为完整 | 课程题库 | [lboez.ts](P4_L6_LBOEZ_2022/lboez.ts) | [lboez.class](P4_L6_LBOEZ_2022/lboez.class) |
+| [P4_L7_TFTC_2022](P4_L7_TFTC_2022/P4_L7_TFTC_2022.md) | P4 | 行为完整 | 课程题库 | [tftc.ts](P4_L7_TFTC_2022/tftc.ts) | [tftc.class](P4_L7_TFTC_2022/tftc.class) |
+| [P4_L8_SB_2022](P4_L8_SB_2022/P4_L8_SB_2022.md) | P4 | 行为完整 | 课程题库 | [sb.ts](P4_L8_SB_2022/sb.ts) | 无 |
+| [P4_L9_BAO_2022](P4_L9_BAO_2022/P4_L9_BAO_2022.md) | P4 | 行为完整 | 课程题库 | [bao.ts](P4_L9_BAO_2022/bao.ts) | [bao.class](P4_L9_BAO_2022/bao.class) |
+| [P4_L9_ras_2023](P4_L9_ras_2023/P4_L9_ras_2023.md) | P4 | 行为完整 | 课程题库 | [ras.ts](P4_L9_ras_2023/ras.ts) | [ras.class](P4_L9_ras_2023/ras.class) |
+| [P4_L10_pcadd_2023](P4_L10_pcadd_2023/P4_L10_pcadd_2023.md) | P4 | 行为完整 | 课程题库 | [pcadd.ts](P4_L10_pcadd_2023/pcadd.ts) | [pcadd.class](P4_L10_pcadd_2023/pcadd.class) |
+| [P4_ES_2024_blog](P4_ES_2024_blog/P4_ES_2024_blog.md) | P4 | 行为完整 | 博客整理 | 无 | [P4_ES_2024_blog_题解.md](P4_ES_2024_blog/P4_ES_2024_blog_题解.md) |
+| [P4_bsoal_2020_blog](P4_bsoal_2020_blog/P4_bsoal_2020_blog.md) | P4 | 行为完整 | 博客整理 | 无 | [P4_bsoal_2020_blog_题解.md](P4_bsoal_2020_blog/P4_bsoal_2020_blog_题解.md) |
+| [P4_cptl_2024_blog](incomplete/P4_cptl_2024_blog/P4_cptl_2024_blog.md) | P4 | 残题 | 博客整理 | 无 | [P4_cptl_2024_blog_题解.md](incomplete/P4_cptl_2024_blog/P4_cptl_2024_blog_题解.md) |
+| [P4_eam_2024_blog](incomplete/P4_eam_2024_blog/P4_eam_2024_blog.md) | P4 | 残题 | 博客整理 | 无 | [P4_eam_2024_blog_题解.md](incomplete/P4_eam_2024_blog/P4_eam_2024_blog_题解.md) |
+| [P4_ibs_2024_blog](incomplete/P4_ibs_2024_blog/P4_ibs_2024_blog.md) | P4 | 残题 | 博客整理 | 无 | [P4_ibs_2024_blog_题解.md](incomplete/P4_ibs_2024_blog/P4_ibs_2024_blog_题解.md) |
+| [P4_olw_2024_blog](incomplete/P4_olw_2024_blog/P4_olw_2024_blog.md) | P4 | 残题 | 博客整理 | 无 | 无 |
+| [P4_swmm_2024_blog](P4_swmm_2024_blog/P4_swmm_2024_blog.md) | P4 | 行为完整 | 博客整理 | 无 | [P4_swmm_2024_blog_题解.md](P4_swmm_2024_blog/P4_swmm_2024_blog_题解.md) |
+| [P4_swrr_2020_blog](P4_swrr_2020_blog/P4_swrr_2020_blog.md) | P4 | 行为完整 | 博客整理 | 无 | [P4_swrr_2020_blog_题解.md](P4_swrr_2020_blog/P4_swrr_2020_blog_题解.md) |
+| [P4_xor_2020_blog](P4_xor_2020_blog/P4_xor_2020_blog.md) | P4 | 行为完整 | 博客整理 | 无 | 无 |
+| [P5_L2_bonall_2022](P5_L2_bonall_2022/P5_L2_bonall_2022.md) | P5 | 行为完整 | 课程题库 | [bonall.ts](P5_L2_bonall_2022/bonall.ts) | [bonall.class](P5_L2_bonall_2022/bonall.class) |
+| [P5_L3_blztal_2022](P5_L3_blztal_2022/P5_L3_blztal_2022.md) | P5 | 行为完整 | 课程题库 | [blztal.ts](P5_L3_blztal_2022/blztal.ts) | [blztal.class](P5_L3_blztal_2022/blztal.class) |
+| [P5_L4_addei_2022](P5_L4_addei_2022/P5_L4_addei_2022.md) | P5 | 行为完整 | 课程题库 | [addei.ts](P5_L4_addei_2022/addei.ts) | [addei.class](P5_L4_addei_2022/addei.class) |
+| [P5_L5_lhogez_2022](P5_L5_lhogez_2022/P5_L5_lhogez_2022.md) | P5 | 行为完整 | 课程题库 | [lhogez.ts](P5_L5_lhogez_2022/lhogez.ts) | [lhogez.class](P5_L5_lhogez_2022/lhogez.class) |
+| [P5_L6_lbget_2022](P5_L6_lbget_2022/P5_L6_lbget_2022.md) | P5 | 行为完整 | 课程题库 | [lbget.ts](P5_L6_lbget_2022/lbget.ts) | [lbget.class](P5_L6_lbget_2022/lbget.class) |
+| [P5-P6_低位清零换一_blog](P5-P6_低位清零换一_blog/P5-P6_低位清零换一_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_低位清零换一_blog_题解.md](P5-P6_低位清零换一_blog/P5-P6_低位清零换一_blog_题解.md) |
+| [P5-P6_偶数位异或_blog](P5-P6_偶数位异或_blog/P5-P6_偶数位异或_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_偶数位异或_blog_题解.md](P5-P6_偶数位异或_blog/P5-P6_偶数位异或_blog_题解.md) |
+| [P5-P6_区间地址写31号_blog](P5-P6_区间地址写31号_blog/P5-P6_区间地址写31号_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_区间地址写31号_blog_题解.md](P5-P6_区间地址写31号_blog/P5-P6_区间地址写31号_blog_题解.md) |
+| [P5-P6_压栈跳转_blog](P5-P6_压栈跳转_blog/P5-P6_压栈跳转_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_压栈跳转_blog_题解.md](P5-P6_压栈跳转_blog/P5-P6_压栈跳转_blog_题解.md) |
+| [P5-P6_同符号跳转_blog](P5-P6_同符号跳转_blog/P5-P6_同符号跳转_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_同符号跳转_blog_题解.md](P5-P6_同符号跳转_blog/P5-P6_同符号跳转_blog_题解.md) |
+| [P5-P6_异或质数寄存器_blog](P5-P6_异或质数寄存器_blog/P5-P6_异或质数寄存器_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_异或质数寄存器_blog_题解.md](P5-P6_异或质数寄存器_blog/P5-P6_异或质数寄存器_blog_题解.md) |
+| [P5-P6_按奇偶循环移位_blog](P5-P6_按奇偶循环移位_blog/P5-P6_按奇偶循环移位_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_按奇偶循环移位_blog_题解.md](P5-P6_按奇偶循环移位_blog/P5-P6_按奇偶循环移位_blog_题解.md) |
+| [P5-P6_条件写rd_blog](incomplete/P5-P6_条件写rd_blog/P5-P6_条件写rd_blog.md) | P5-P6 | 残题 | 博客整理 | 无 | [P5-P6_条件写rd_blog_题解.md](incomplete/P5-P6_条件写rd_blog/P5-P6_条件写rd_blog_题解.md) |
+| [P5-P6_比较写45号_blog](P5-P6_比较写45号_blog/P5-P6_比较写45号_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_比较写45号_blog_题解.md](P5-P6_比较写45号_blog/P5-P6_比较写45号_blog_题解.md) |
+| [P5-P6_负值变距跳转链接_blog](incomplete/P5-P6_负值变距跳转链接_blog/P5-P6_负值变距跳转链接_blog.md) | P5-P6 | 残题 | 博客整理 | 无 | [P5-P6_负值变距跳转链接_blog_题解.md](incomplete/P5-P6_负值变距跳转链接_blog/P5-P6_负值变距跳转链接_blog_题解.md) |
+| [P5-P6_负字节写base_blog](P5-P6_负字节写base_blog/P5-P6_负字节写base_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_负字节写base_blog_题解.md](P5-P6_负字节写base_blog/P5-P6_负字节写base_blog_题解.md) |
+| [P5-P6_较小偶数跳转链接_blog](P5-P6_较小偶数跳转链接_blog/P5-P6_较小偶数跳转链接_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_较小偶数跳转链接_blog_题解.md](P5-P6_较小偶数跳转链接_blog/P5-P6_较小偶数跳转链接_blog_题解.md) |
+| [P5-P6_零值跳转链接_blog](P5-P6_零值跳转链接_blog/P5-P6_零值跳转链接_blog.md) | P5-P6 | 行为完整 | 博客整理 | 无 | [P5-P6_零值跳转链接_blog_题解.md](P5-P6_零值跳转链接_blog/P5-P6_零值跳转链接_blog_题解.md) |
+| [P5_M_lwer_2022](P5_M_lwer_2022/P5_M_lwer_2022.md) | P5 | 行为完整 | 课程题库 | [lwer.ts](P5_M_lwer_2022/lwer.ts) | 无 |
+| [P5_addoi_2024_blog](incomplete/P5_addoi_2024_blog/P5_addoi_2024_blog.md) | P5 | 残题 | 博客整理 | 无 | [P5_addoi_2024_blog_题解.md](incomplete/P5_addoi_2024_blog/P5_addoi_2024_blog_题解.md) |
+| [P5_ae_2024_blog](P5_ae_2024_blog/P5_ae_2024_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_ae_2024_blog_题解.md](P5_ae_2024_blog/P5_ae_2024_blog_题解.md) |
+| [P5_bgezall_2020_blog](P5_bgezall_2020_blog/P5_bgezall_2020_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_bgezall_2020_blog_题解.md](P5_bgezall_2020_blog/P5_bgezall_2020_blog_题解.md) |
+| [P5_blezalc_2020_blog](P5_blezalc_2020_blog/P5_blezalc_2020_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_blezalc_2020_blog_题解.md](P5_blezalc_2020_blog/P5_blezalc_2020_blog_题解.md) |
+| [P5_bmoal_2024_blog](P5_bmoal_2024_blog/P5_bmoal_2024_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_bmoal_2024_blog_题解.md](P5_bmoal_2024_blog/P5_bmoal_2024_blog_题解.md) |
+| [P5_cco_2020_blog](P5_cco_2020_blog/P5_cco_2020_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_cco_2020_blog_题解.md](P5_cco_2020_blog/P5_cco_2020_blog_题解.md) |
+| [P5_cmco_2020_blog](P5_cmco_2020_blog/P5_cmco_2020_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_cmco_2020_blog_题解.md](P5_cmco_2020_blog/P5_cmco_2020_blog_题解.md) |
+| [P5_jtl_2024_blog](incomplete/P5_jtl_2024_blog/P5_jtl_2024_blog.md) | P5 | 残题 | 博客整理 | 无 | 无 |
+| [P5_lrm_2020_blog](P5_lrm_2020_blog/P5_lrm_2020_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_lrm_2020_blog_题解.md](P5_lrm_2020_blog/P5_lrm_2020_blog_题解.md) |
+| [P5_lwoc_2024_blog](P5_lwoc_2024_blog/P5_lwoc_2024_blog.md) | P5 | 行为完整 | 博客整理 | 无 | [P5_lwoc_2024_blog_题解.md](P5_lwoc_2024_blog/P5_lwoc_2024_blog_题解.md) |
+| [P5_lwso_2020_blog](incomplete/P5_lwso_2020_blog/P5_lwso_2020_blog.md) | P5 | 残题 | 博客整理 | 无 | [P5_lwso_2020_blog_题解.md](incomplete/P5_lwso_2020_blog/P5_lwso_2020_blog_题解.md) |
+| [P5_swc_2021_blog](P5_swc_2021_blog/P5_swc_2021_blog.md) | P5 | 行为完整 | 博客整理 | 无 | 无 |
+| [P5_xe_2024_blog](incomplete/P5_xe_2024_blog/P5_xe_2024_blog.md) | P5 | 残题 | 博客整理 | 无 | [P5_xe_2024_blog_题解.md](incomplete/P5_xe_2024_blog/P5_xe_2024_blog_题解.md) |
+| [P5_跳转并链接比较_blog](incomplete/P5_跳转并链接比较_blog/P5_跳转并链接比较_blog.md) | P5 | 残题 | 博客整理 | 无 | [P5_跳转并链接比较_blog_题解.md](incomplete/P5_跳转并链接比较_blog/P5_跳转并链接比较_blog_题解.md) |
+| [P6_LoadPrimeXor_2024_blog](incomplete/P6_LoadPrimeXor_2024_blog/P6_LoadPrimeXor_2024_blog.md) | P6 | 残题 | 博客整理 | 无 | [P6_LoadPrimeXor_2024_blog_题解.md](incomplete/P6_LoadPrimeXor_2024_blog/P6_LoadPrimeXor_2024_blog_题解.md) |
+| [P6_bds_2021_blog](incomplete/P6_bds_2021_blog/P6_bds_2021_blog.md) | P6 | 残题 | 博客整理 | 无 | [P6_bds_2021_blog_题解.md](incomplete/P6_bds_2021_blog/P6_bds_2021_blog_题解.md) |
+| [P6_bezal_2021_blog](P6_bezal_2021_blog/P6_bezal_2021_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_bezal_2021_blog_题解.md](P6_bezal_2021_blog/P6_bezal_2021_blog_题解.md) |
+| [P6_bgezalr_2020_blog](P6_bgezalr_2020_blog/P6_bgezalr_2020_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_bgezalr_2020_blog_题解.md](P6_bgezalr_2020_blog/P6_bgezalr_2020_blog_题解.md) |
+| [P6_btd_2024_blog](P6_btd_2024_blog/P6_btd_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_btd_2024_blog_题解.md](P6_btd_2024_blog/P6_btd_2024_blog_题解.md) |
+| [P6_crt_2024_blog](P6_crt_2024_blog/P6_crt_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_crt_2024_blog_题解.md](P6_crt_2024_blog/P6_crt_2024_blog_题解.md) |
+| [P6_fmultu_2024_blog](P6_fmultu_2024_blog/P6_fmultu_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_fmultu_2024_blog_题解.md](P6_fmultu_2024_blog/P6_fmultu_2024_blog_题解.md) |
+| [P6_jmv_2024_blog](P6_jmv_2024_blog/P6_jmv_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_jmv_2024_blog_题解.md](P6_jmv_2024_blog/P6_jmv_2024_blog_题解.md) |
+| [P6_lhs_2020_blog](P6_lhs_2020_blog/P6_lhs_2020_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_lhs_2020_blog_题解.md](P6_lhs_2020_blog/P6_lhs_2020_blog_题解.md) |
+| [P6_lwc_2024_blog](P6_lwc_2024_blog/P6_lwc_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_lwc_2024_blog_题解.md](P6_lwc_2024_blog/P6_lwc_2024_blog_题解.md) |
+| [P6_lwm_2024_blog](P6_lwm_2024_blog/P6_lwm_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_lwm_2024_blog_题解.md](P6_lwm_2024_blog/P6_lwm_2024_blog_题解.md) |
+| [P6_lwmx_2021_blog](P6_lwmx_2021_blog/P6_lwmx_2021_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_lwmx_2021_blog_题解.md](P6_lwmx_2021_blog/P6_lwmx_2021_blog_题解.md) |
+| [P6_lwz_2024_blog](incomplete/P6_lwz_2024_blog/P6_lwz_2024_blog.md) | P6 | 残题 | 博客整理 | 无 | [P6_lwz_2024_blog_题解.md](incomplete/P6_lwz_2024_blog/P6_lwz_2024_blog_题解.md) |
+| [P6_msub_2020_blog](P6_msub_2020_blog/P6_msub_2020_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_msub_2020_blog_题解.md](P6_msub_2020_blog/P6_msub_2020_blog_题解.md) |
+| [P6_sbc_2024_blog](P6_sbc_2024_blog/P6_sbc_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_sbc_2024_blog_题解.md](P6_sbc_2024_blog/P6_sbc_2024_blog_题解.md) |
+| [P6_shl_2022_blog](P6_shl_2022_blog/P6_shl_2022_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_shl_2022_blog_题解.md](P6_shl_2022_blog/P6_shl_2022_blog_题解.md) |
+| [P6_wtd_2024_blog](P6_wtd_2024_blog/P6_wtd_2024_blog.md) | P6 | 行为完整 | 博客整理 | 无 | [P6_wtd_2024_blog_题解.md](P6_wtd_2024_blog/P6_wtd_2024_blog_题解.md) |
+| [P7_CP0内存限制异常_2024_blog](P7_CP0内存限制异常_2024_blog/P7_CP0内存限制异常_2024_blog.md) | P7 | 行为完整 | 博客整理 | 无 | [P7_CP0内存限制异常_2024_blog_题解.md](P7_CP0内存限制异常_2024_blog/P7_CP0内存限制异常_2024_blog_题解.md) |
+| [P7_Watch异常_2024_blog](incomplete/P7_Watch异常_2024_blog/P7_Watch异常_2024_blog.md) | P7 | 残题 | 博客整理 | 无 | [P7_Watch异常_2024_blog_题解.md](incomplete/P7_Watch异常_2024_blog/P7_Watch异常_2024_blog_题解.md) |
+| [P7_lww_2024_blog](incomplete/P7_lww_2024_blog/P7_lww_2024_blog.md) | P7 | 资料残缺 | 博主自拟资料（非考题） | 无 | [P7_lww_2024_blog_题解.md](incomplete/P7_lww_2024_blog/P7_lww_2024_blog_题解.md) |
+| [P7_tltiu_2021_blog](P7_tltiu_2021_blog/P7_tltiu_2021_blog.md) | P7 | 行为完整 | 博客整理 | 无 | [P7_tltiu_2021_blog_题解.md](P7_tltiu_2021_blog/P7_tltiu_2021_blog_题解.md) |
+| [P7_withdraw_2024_blog](incomplete/P7_withdraw_2024_blog/P7_withdraw_2024_blog.md) | P7 | 残题 | 博客整理 | 无 | [P7_withdraw_2024_blog_题解.md](incomplete/P7_withdraw_2024_blog/P7_withdraw_2024_blog_题解.md) |
 
 
 ## 博客来源题目（`*_blog`）
 
-以下题目整理自往届博客，来源链接写在每份题面的「出处」小节。
+本轮整理的 93 个博客条目中，59 个可还原核心行为，保留在根目录；33 个关键行为仍有缺失或冲突的题目，以及 1 个博主自拟且不完整的参考设想，集中在 [incomplete/](incomplete/README.md)。原始题面与题解分别保留，具体来源、校勘依据和未决信息写在各题中。
 
-- 目录命名：加指令题 `P?_<指令名>_<年份>_blog`；非加指令题 `P?_<内容概述>_<年份>_blog`；年份无法确定的省略。
+- 目录命名：加指令题 `P?_<指令名>_<年份>_blog`；非加指令题 `P?_<内容概述>_<年份>_blog`；年份无法确定的省略。保留 `Pre` 和来源未分清的 `P5-P6` 阶段，不强行改为单一阶段。
 - **不提供 TS 脚本与 `.class` 附件**：博客只留下题面/回忆，没有课程组原始附件；请按题面自行设计 CPU 改动。
 - 同一题的题解另存为同目录 `<目录名>_题解.md`（有则存在）。
+- **判残只看关键行为能否还原**：缺 `opcode/funct` 或原评测接口名称不等于行为残缺。行为完整而编码未载的题目会直接说明编码缺项，不自行配码。对相互冲突、运算未定义或关键条件缺失的记录，不增设本仓库约定、不补造题目。
+- `P7_lww_2024_blog` 是原博主自行提出的变体，**不是 2024 年考题记录**；仅作为带出处的残缺资料保存。
+- 文中“本地课程教程”指本工作区的课程 Markdown 路径，不随本仓库发布；来源博客链接为公开出处。表格的“行为完整”不表示该条是官方题面或已取得原评测接口、附件及测试点。
+- 管理页面会列出全部条目，可按阶段、课程题库、行为完整的博客题或残题筛选；残题仍可查看、编辑、管理题解附件。编辑状态可在根目录与 `incomplete/` 之间移动整题，脚本字段可留空。

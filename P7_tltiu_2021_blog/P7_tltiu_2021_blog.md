@@ -1,58 +1,44 @@
 # P7_tltiu_2021_blog
 
-> 项目：P7 ｜ 指令：tltiu ｜ 年份：2021 ｜ 类型：真题 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/16/CO%20-%20P7/)、[Thysrael](https://thysrael.github.io/posts/4c542040/)
+> 项目：P7 ｜ 指令：tltiu ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/16/CO%20-%20P7/)、[Thysrael](https://thysrael.github.io/posts/4c542040/)
 >
-> 本题来自博客记录（非官方题面），文字为博主原文或回忆版，缺失字段以“博客未给出”标注。
+> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。
 
-## 编码
+## 题目：无符号小于符号扩展立即数时陷入
 
-| 位域 | 31…26 | 25…21 | 20…16 | 15…0 |
-| --- | --- | --- | --- | --- |
-| 字段 | REGIMM | rs | TLTIU | immediate |
-| 编码 / 位宽 | 000000 / 6 | 5 | 01011 / 5 | 16 |
+## 编码与汇编格式
 
-## 格式
+博客表格把REGIMM操作码写为`000000`，同时rt固定为`01011`。该opcode与REGIMM名称冲突：标准tltiu以及本地MARS的InstructionSet.java中为`000001 rs 01011 immediate`。这里将`000000`保留为来源疑误，不将其当作可直接汇编的原题编码；实际复现应先核定所用编码。
 
-`tltiu rs, immediate`
+`tltiu rs, immediate`（来源记录），immediate为16位字段。
 
 ## 描述
 
-博客原文：P7 课上为 4 道题，第 1 题为必做题，第 2~4 题为选做题，做出其中两道即达到通过条件。四道题原文如下：
-
-- 第 1 题：P6 所有指令 & mfc0 & mtc0 —— 功能强测
-- 第 2 题：第 1 题 & 异常检测 —— 异常强测
-- 第 3 题：第 1 题 & 中断检测 —— 中断强测
-- 第 4 题：加判断异常指令 ↓ —— 即 `P7_L1_tltiu`
-
-指令名：`tltiu`
-
-如果 `GPR[rs]` 小于立即数，则产生 Trap 异常（ExcCode = 5'd13）
+先将16位立即数符号扩展到32位，再把源寄存器和扩展结果均解释为无符号32位整数比较。源值较小时产生Trap异常，ExcCode=13；否则继续执行，不写GPR、HI/LO或数据存储器。
 
 ## 操作
 
+`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
+
+```text
+A ← U32(GPR[rs])
+I ← U32(SignExtend16To32(immediate))
+if A < I:
+    SignalException(Trap, ExcCode=13)
+else:
+    continue sequential execution
 ```
-If (0||GPR[rs]) < (0||sign_extend(immediate)) then
-    SignalException(Trap)
-endif
-```
 
-## 示例
+## 边界与异常
 
-`tltiu $t1, 20`
+“unsigned”修饰比较，不表示立即数零扩展。例如immediate=0xffff时I=0xffffffff，除rs全一外均满足条件；immediate=0时没有无符号源值更小。
 
-## 其他
+## 课程语义
 
-MIPS 英文指令集与原版 MARS 中均包含该指令
+按P7 CP0规范（本地课程教程：`P7/implement/P7-2-3.md`）及精确异常规则（本地课程教程：`P7/implement/P7-2-4.md`），异常/中断请求获准提交时统一进入0x4180，受害指令及年轻指令不得留下GPR、HI/LO、内存或外设副作用，较老指令正常完成。记录受害PC及BD；受害指令在延迟槽时EPC为其PC−4且BD=1，否则EPC为其PC且BD=0。普通分支/跳转保留延迟槽，eret无延迟槽。新CP0寄存器的读写亦须保持程序顺序；本题特例与优先级缺项另行说明。
 
-## 说明
+## 出处与资料缺项
 
-- 年份：博客发布于 2021-12-16（2020 级，2021 年秋季 CO 上机）。
-- 本篇是 P7 课上题目的唯一"加指令"题（第 4 题），前三题是强测（功能/异常/中断），没有独立题面文字。
-- 博主在《计组实验总结》中补充：P7 课上唯一要加的是一条产生异常指令，"其与其他可能产生异常的指令（如 add）所需要的通路和判断条件都基本相同，同时根据要使用的寄存器记得加入转发/暂停条件"。
-- 该文没有给出题解。原文第 1 题写作"P6所有指令 & mfc0 & mtc0"，其中 "P6" 按上下文应指"P6 阶段实现的全部指令"，照录不改。
-
-## 出处
-
-- 来源博客：master-Tan（真题）、Thysrael（片段）
-- 原始链接：https://master-tan.github.io/2021/12/16/CO%20-%20P7/、https://thysrael.github.io/posts/4c542040/
-- 类型：真题；整理自博客原文，未经课程组核对。
+- 来源：[master-Tan](https://master-tan.github.io/2021/12/16/CO%20-%20P7/)、[Thysrael](https://thysrael.github.io/posts/4c542040/)。
+- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。
+- 操作语义以来源明确给出的“0||sign_extend(immediate)”为准；修正编码疑误不改变该语义。

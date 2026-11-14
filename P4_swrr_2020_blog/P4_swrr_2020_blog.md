@@ -1,42 +1,45 @@
 # P4_swrr_2020_blog
 
-> 项目：P4 ｜ 指令：swrr ｜ 年份：2020 ｜ 类型：真题 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)
->
-> 本题来自博客记录（非官方题面），文字为博主原文或回忆版，缺失字段以“博客未给出”标注。
+> 项目：P4 ｜ 指令：swrr ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)
 
-## 编码
+本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。
 
-博客未给出编码（opcode / func）。
+## 题目：按地址低位循环右移后存字
 
-## 格式
+## 编码与格式
 
-博客未给出。
+opcode 及完整编码未记录。
+
+汇编语法未记录；RTL 使用 `base`、`rt` 和符号扩展的 `offset`。
 
 ## 描述
 
-> 第三题：swrr
->
-> 向右循环位移，有点类似 sw。注意好好看题！题目要求 `$display()` 要字对齐。
+计算有效字节地址。将 `rt` 按地址低两位指定的字节数循环右移，再写入该地址所在的内存字。输出访存记录时要求地址按字对齐。
 
-$$
-\begin{aligned}
-& Addr \leftarrow GPR[base] + \mathtt{sign\_ext}(offset) \\
-& temp \leftarrow Addr_{1..0} \\
-& \operatorname{if}\ temp == 0\ \operatorname{then} \\
-& \qquad mem_{addr} \leftarrow GRF[rt] \\
-& \operatorname{else} \\
-& \qquad mem_{addr} \leftarrow GRF[rt]_{8*temp - 1 \cdots 0}||GRF[rt]_{31 \cdots 8*temp}
-\end{aligned}
-$$
+## 操作
 
-## 说明
+`GPR[n]` 是 32 位寄存器位串，位编号从最低位 0 到最高位 31；`x[h:l]` 包含两端，`||` 表示高位在左的拼接。`S32(x)` 表示将 32 位位串按二进制补码解释；`SEXT32(x)` 表示按原字段最高位符号扩展到 32 位。涉及 PC 时，`P0` 固定指本指令的地址，所有右侧源寄存器均取本指令执行前的值。课程规定的普通 32 位加减法保留低 32 位，不因溢出触发异常；本题显式给出更宽运算或溢出检测时按本题执行。写入 0 号寄存器不改变其恒零状态。
 
-- 考试形式：P4 上机（Verilog 单周期 CPU 加指令），本次三道题中的第三题（访存类）。
-- 年份：2020（文章发布 2020-11-19）。
-- 博客未给出 opcode 编码与测试点；注意题面额外要求 `$display()` 输出字对齐。
+```text
+Addr ← low32(GPR[base] + SEXT32(offset))
+b ← unsigned(Addr[1:0])
+if b = 0: data ← GPR[rt]
+else: data ← GPR[rt][8*b-1:0] || GPR[rt][31:8*b]
+MemoryWordContaining(Addr) ← data
+```
 
-## 出处
+## 边界条件
 
-- 来源博客：roife（真题）
-- 原始链接：https://roife.github.io/posts/buaa-co-lab-p4/
-- 类型：真题；整理自博客原文，未经课程组核对。
+`b=0,1,2,3` 分别循环右移 0、8、16、24 位。移出的低位拼接到高位，不补符号位或零。写入一整个字，寄存器不变。
+
+## 课程阶段注意
+
+P4 为 Verilog 单周期 CPU，无分支延迟槽。
+
+访存记录地址取 `Addr[31:2] || 00`，数据输出为循环移位后的完整字。顺序继续至 `P0+4`。
+
+## 出处与资料缺项
+
+[roife](https://roife.github.io/posts/buaa-co-lab-p4/)
+
+原博客未提供异常或越界语义；内存按课程 DM 的字寻址实现解释，地址低两位用于旋转而不另建非对齐跨字写。
