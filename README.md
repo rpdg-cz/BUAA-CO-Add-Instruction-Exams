@@ -127,3 +127,12 @@ P3、P4 按课程不启用延迟槽，P5～P7 按课程启用。脚本声明了�
 | [P5_L5_lhogez_2022](P5_L5_lhogez_2022/P5_L5_lhogez_2022.md) | P5 | [lhogez.ts](P5_L5_lhogez_2022/lhogez.ts) | [lhogez.class](P5_L5_lhogez_2022/lhogez.class) |
 | [P5_L6_lbget_2022](P5_L6_lbget_2022/P5_L6_lbget_2022.md) | P5 | [lbget.ts](P5_L6_lbget_2022/lbget.ts) | [lbget.class](P5_L6_lbget_2022/lbget.class) |
 | [P5_M_lwer_2022](P5_M_lwer_2022/P5_M_lwer_2022.md) | P5 | [lwer.ts](P5_M_lwer_2022/lwer.ts) | 无 |
+
+
+## 博客来源题目（`*_blog`）
+
+以下题目整理自往届博客，来源链接写在每份题面的「出处」小节。
+
+- 目录命名：加指令题 `P?_<指令名>_<年份>_blog`；非加指令题 `P?_<内容概述>_<年份>_blog`；年份无法确定的省略。
+- **不提供 TS 脚本与 `.class` 附件**：博客只留下题面/回忆，没有课程组原始附件；请按题面自行设计 CPU 改动。
+- 同一题的题解另存为同目录 `<目录名>_题解.md`（有则存在）。
