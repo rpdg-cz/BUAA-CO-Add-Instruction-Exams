@@ -4,9 +4,9 @@
 
 ## 编码
 
-| 31..0 |
-| --- |
-| `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| 31..26 | 25..21 | 20..16 | 15..0 |
+| --- | --- | --- | --- |
+| `xxxxxx` | `base` | `rt` | `offset` |
 
 ## 格式
 

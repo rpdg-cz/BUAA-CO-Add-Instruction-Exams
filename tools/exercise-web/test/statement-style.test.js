@@ -26,7 +26,7 @@ test('真实题面与题解保持纯题意，维护记录独立于可见文件',
   }
 });
 
-test('指令编码保留32位，操作使用手册记号和成对的Pascal控制结构', () => {
+test('指令编码保留32位及默认操作数位置，操作使用手册记号和成对的Pascal控制结构', () => {
   for (const row of blogs().filter(item => /^P[3-7]/.test(item.stage))) {
     const file = path.join(root, row.relativePath, row.statementFile);
     const text = fs.readFileSync(file, 'utf8');
@@ -38,6 +38,8 @@ test('指令编码保留32位，操作使用手册记号和成对的Pascal控制
       const fields = cells(lines[0]);
       const values = cells(lines[2]);
       assert.equal(fields.length, values.length, row.id);
+      assert.equal(fields[0], '31..26', `${row.id}: opcode应单独表示，不能把已知操作数合并成整条x`);
+      const defaultPositions = { rs: '25..21', base: '25..21', rt: '20..16', rd: '15..11', offset: '15..0', immediate: '15..0', imm: '15..0' };
       let next = 31;
       fields.forEach((field, index) => {
         const match = /^(\d+)\.\.(\d+)$/.exec(field);
@@ -46,6 +48,7 @@ test('指令编码保留32位，操作使用手册记号和成对的Pascal控制
         assert.equal(high, next, `${row.id}: 编码位号不连续`);
         assert.ok(high >= low && low >= 0, row.id);
         if (/^[01x]+$/.test(values[index])) assert.equal(values[index].length, high - low + 1, `${row.id}: 固定位/x宽度错误`);
+        if (Object.hasOwn(defaultPositions, values[index])) assert.equal(field, defaultPositions[values[index]], `${row.id}: ${values[index]}默认位域错误`);
         assert.doesNotMatch(values[index], /(?:未|未知|记录|来源)/, row.id);
         next = low - 1;
       });
