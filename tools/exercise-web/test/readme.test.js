@@ -56,3 +56,17 @@ test('README 为符号链接时拒绝同步，不修改外部文件', t => {
   assert.throws(() => syncReadme(repo, [exercise]));
   assert.equal(fs.readFileSync(outside, 'utf8'), '# 外部文档\n');
 });
+
+
+test('README 状态区分原完整博客题和残题补全，补全不覆盖自拟资料来源身份', () => {
+  const original = { id: 'P5_原完整_blog', stage: 'P5', status: 'complete', source: { kind: 'blog' }, attachments: [] };
+  const supplemented = { ...original, id: 'P5_补全_blog', status: 'supplemented', relativePath: 'supplemented/P5_补全_blog' };
+  const proposal = { ...supplemented, id: 'P5_lww_blog', relativePath: 'supplemented/P5_lww_blog', source: { kind: 'blog', provenance: 'proposal' } };
+  const result = composeReadme('# 题库\n', [original, supplemented, proposal]);
+  const rows = result.content.split('\n').filter(line => line.startsWith('| [P5_'));
+  assert.match(rows[0], /\| 行为完整 \| 博客整理 \|/);
+  assert.match(rows[1], /supplemented\/P5_补全_blog\/P5_补全_blog.md/);
+  assert.match(rows[1], /\| 残题补全 \| 博客整理 \|/);
+  assert.match(rows[2], /\| 残题补全 \| 博主自拟资料（非考题） \|/);
+  assert.doesNotMatch(result.content, /资料残缺|关键行为未还原/);
+});

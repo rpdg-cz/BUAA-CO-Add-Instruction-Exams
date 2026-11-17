@@ -10,7 +10,7 @@ const MAX_BYTES = 1024 * 1024;
 const cache = new Map();
 
 // Metadata is separate from the exam statement. Keep only the parsed source in
-// this lazy cache; potentially lengthy editorial records never enter API DTOs.
+// this lazy cache; editorial and completion records never enter API DTOs.
 function readExerciseSidecar(directory, expectedKind) {
   const file = path.join(directory, SIDECAR_NAME);
   const stat = assertRegularFile(directory, file, { allowMissing: true });

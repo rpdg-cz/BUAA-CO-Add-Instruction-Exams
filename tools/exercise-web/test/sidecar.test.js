@@ -14,6 +14,7 @@ const ID = 'P5_来源回归_2024_blog';
 const STATEMENT = '# 来源回归\n\n## 题目描述\n\n令目标寄存器加一。\n';
 const SCRIPT = 'export default { mnemonic: "fixture" };\n';
 const EDITORIAL = '仅维护者可见的改写依据，不应进入题面或 HTTP 响应';
+const COMPLETION = { date: '2026-11-17', conditions: ['写回结果按 32 位无符号数截断', '目标寄存器为 $0 时不写回'] };
 const SOURCE = {
   kind: 'blog', provenance: 'proposal', project: 'P5-P6', year: '2021',
   type: '博主自拟', author: '中文 作者', url: 'https://example.org/blog/source?year=2021#instruction',
@@ -33,7 +34,7 @@ function fixture(t, { sidecar = true, statement = STATEMENT } = {}) {
 }
 
 function metadata(source = SOURCE) {
-  return { version: 1, source, editorial: { notes: EDITORIAL, previousStatement: '# 旧题面' } };
+  return { version: 1, source, completion: COMPLETION, editorial: { notes: EDITORIAL, previousStatement: '# 旧题面' } };
 }
 
 function writeMetadata(dir, source = SOURCE) {
@@ -42,6 +43,9 @@ function writeMetadata(dir, source = SOURCE) {
 
 function assertPrivate(detail) {
   assert.equal(Object.hasOwn(detail, 'editorial'), false);
+  assert.equal(Object.hasOwn(detail, 'completion'), false);
+  assert.equal(Object.hasOwn(detail.source, 'completion'), false);
+  assert.doesNotMatch(JSON.stringify(detail), /写回结果按|目标寄存器为/);
   assert.equal(Object.hasOwn(detail.source, 'editorial'), false);
   assert.doesNotMatch(JSON.stringify(detail), new RegExp(EDITORIAL));
   assert.equal(detail.files.some(file => file.name === SIDECAR_NAME), false);
@@ -85,7 +89,7 @@ test('干净题面从隐藏 sidecar 读取作者、链接、年份及类型，�
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, SIDECAR_NAME), 'utf8')), metadata());
 });
 
-test('真实 HTTP 列表与详情 DTO 不泄露 editorial，隐藏元数据无法作为附件下载', async (t) => {
+test('真实 HTTP 列表与详情 DTO 不泄露 editorial 和补全条件，隐藏元数据无法作为附件下载', async (t) => {
   const { root } = fixture(t);
   const server = createServer({ repoRoot: root, quiet: true, adminToken: '' });
   await new Promise((resolve, reject) => {
@@ -97,7 +101,7 @@ test('真实 HTTP 列表与详情 DTO 不泄露 editorial，隐藏元数据无�
     for (const pathname of ['/api/exercises', `/api/exercises/${encodeURIComponent(ID)}`]) {
       const response = await request(base, pathname);
       assert.equal(response.status, 200, response.body);
-      assert.doesNotMatch(response.body, /editorial|仅维护者可见|previousStatement/);
+      assert.doesNotMatch(response.body, /editorial|completion|仅维护者可见|previousStatement|写回结果按|目标寄存器为/);
       const body = JSON.parse(response.body);
       const detail = body.exercise || body.exercises[0];
       assert.deepEqual(detail.source, SOURCE);
@@ -111,28 +115,33 @@ test('真实 HTTP 列表与详情 DTO 不泄露 editorial，隐藏元数据无�
   }
 });
 
-test('题面和脚本编辑、状态迁移保留同目录 sidecar，删除重建不会恢复旧来源', (t) => {
+test('题面和脚本编辑、双向状态迁移原样保留补全记录，删除重建不会恢复旧来源', (t) => {
   const { root, dir, file } = fixture(t);
   const originalMetadata = fs.readFileSync(file, 'utf8');
   store.readExercise(root, ID); // Prime the old location cache before moving.
   const edited = '# 编辑后的题面\n';
   let detail = store.updateExercise(root, ID, {
-    statement: edited, scriptName: 'renamed', script: '// 已编辑\n', status: 'incomplete',
+    statement: edited, scriptName: 'renamed', script: '// 已编辑\n', status: 'supplemented',
   });
-  const archived = path.join(root, 'incomplete', ID);
+  const supplemented = path.join(root, 'supplemented', ID);
   assert.equal(fs.existsSync(dir), false);
-  assert.equal(detail.status, 'incomplete');
-  assert.equal(detail.relativePath, `incomplete/${ID}`);
-  assert.equal(fs.readFileSync(path.join(archived, SIDECAR_NAME), 'utf8'), originalMetadata);
+  assert.equal(detail.status, 'supplemented');
+  assert.equal(detail.relativePath, `supplemented/${ID}`);
+  assert.equal(fs.readFileSync(path.join(supplemented, SIDECAR_NAME), 'utf8'), originalMetadata);
   assert.deepEqual(detail.source, SOURCE);
   assert.equal(store.readExercise(root, ID).statement, edited);
   assert.equal(store.readExercise(root, ID).script, '// 已编辑\n');
   const movedSource = { ...SOURCE, author: '迁移后作者', year: '2022' };
-  writeMetadata(archived, movedSource);
+  writeMetadata(supplemented, movedSource);
   detail = store.updateExercise(root, ID, { status: 'complete' });
-  assert.equal(fs.existsSync(archived), false);
+  assert.equal(fs.existsSync(supplemented), false);
   assert.deepEqual(detail.source, movedSource);
   assert.equal(fs.existsSync(file), true);
+  assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')).completion, COMPLETION);
+  store.saveAttachment(root, ID, '新增题解.md', Buffer.from('# 新增题解\n'));
+  store.deleteAttachment(root, ID, '新增题解.md');
+  assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')).completion, COMPLETION);
+  assertPrivate(store.readExercise(root, ID));
   store.deleteExercise(root, ID);
   assert.equal(fs.existsSync(dir), false);
   assert.deepEqual(store.listExercises(root), []);

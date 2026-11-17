@@ -106,12 +106,12 @@ function visibleExercises() {
   const keyword = state.filters.search.trim().toLowerCase();
   return state.exercises.filter((item) => {
     if (state.filters.stage && item.stage !== state.filters.stage) return false;
-    const category = item.status === 'incomplete' ? 'incomplete' : item.source?.kind || 'course';
+    const category = item.status === 'supplemented' ? 'supplemented' : item.source?.kind || 'course';
     if (state.filters.category && category !== state.filters.category) return false;
     if (!keyword) return true;
     const haystack = [
       item.id, item.title, item.scriptName, item.scriptFile, item.source?.author, item.source?.year,
-      item.status === 'incomplete' ? '残题' : '',
+      item.status === 'supplemented' ? '残题补全' : '',
       item.source && item.source.problemId,
       item.source && item.source.pieId,
     ].filter(Boolean).join(' ').toLowerCase();
@@ -141,12 +141,12 @@ function renderList() {
   el.list.innerHTML = items.map((item) => {
     const active = item.id === state.selectedId ? ' active' : '';
     const script = item.scriptFile ? `<code>${escapeHtml(item.scriptFile)}</code>` : '无脚本';
-    const source = item.source?.kind === 'blog' ? `${item.source.provenance === 'proposal' ? '博主自拟资料（非考题）' : '博客'} · ${item.source.author || '往届记录'}${item.status === 'incomplete' ? ' · 行为残缺' : ''}` : item.source && item.source.problemId
+    const source = item.source?.kind === 'blog' ? `${item.source.provenance === 'proposal' ? '博主自拟资料（非考题）' : '博客'} · ${item.source.author || '往届记录'}` : item.source && item.source.problemId
       ? `#${item.source.problemId}${item.source.pieId ? ` · Pie ${item.source.pieId}` : ''}`
       : '无原题编号';
     return `<li data-id="${escapeHtml(item.id)}" class="${active.trim()}">
       <div class="item-title"><span class="stage ${escapeHtml(item.stage)}">${escapeHtml(item.stage)}</span>${escapeHtml(item.id)}</div>
-      <div class="item-meta"><span>${script}</span><span>${escapeHtml(source)}</span></div>
+      <div class="item-meta"><span>${script}</span><span>${escapeHtml(source)}${item.status === 'supplemented' ? ' · 残题补全' : ''}</span></div>
     </li>`;
   }).join('');
 }
@@ -221,11 +221,12 @@ function renderDetail() {
   const source = item.source || {};
   const chips = [
     `<span class="chip"><b>${escapeHtml(item.stage)}</b></span>`,
-    `<span class="chip">${item.status === 'incomplete' ? source.provenance === 'proposal' ? '残缺参考资料 · 非考题' : '残题 · 关键行为未还原' : '行为完整'}${source.kind === 'blog' ? ' · 博客整理' : ''}</span>`,
+    `<span class="chip">${item.status === 'supplemented' ? '残题补全' : '行为完整'}${source.kind === 'blog' ? ' · 博客整理' : ''}</span>`,
     item.scriptFile ? `<span class="chip">脚本 <b>${escapeHtml(item.scriptFile)}</b></span>` : '<span class="chip">无脚本</span>',
     `<span class="chip">文件 <b>${item.files ? item.files.length : 0}</b></span>`,
     `<span class="chip">更新 <b>${escapeHtml((item.modified || '').slice(0, 10))}</b></span>`,
   ];
+  if (source.provenance === 'proposal') chips.push('<span class="chip">博主自拟资料 · 非考题</span>');
   if (source.project) chips.push(`<span class="chip">项目 <b>${escapeHtml(source.project)}</b></span>`);
   if (source.type) chips.push(`<span class="chip">类型 <b>${escapeHtml(source.type)}</b></span>`);
   if (item.metadataDiagnostic) chips.push(`<span class="chip" title="${escapeHtml(item.metadataDiagnostic)}">元数据待修复</span>`);

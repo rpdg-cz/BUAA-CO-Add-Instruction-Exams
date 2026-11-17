@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P7",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "kie-chi",
+    "url": "https://kie-chi.com/2024/12/08/CO_P7/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P7_withdraw_2024_blog\n\n> 项目：P7 ｜ 指令：withdraw ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[kie-chi](https://kie-chi.com/2024/12/08/CO_P7/)、[UHO](https://theuho.site/2024/12/11/COexamP7/)\n>\n> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：残题：指令行为尚不能唯一还原。\n\n",
+      "## 课程语义\n\n按P7 CP0规范（本地课程教程：`P7/implement/P7-2-3.md`）及精确异常规则（本地课程教程：`P7/implement/P7-2-4.md`），异常/中断请求获准提交时统一进入0x4180，受害指令及年轻指令不得留下GPR、HI/LO、内存或外设副作用，较老指令正常完成。记录受害PC及BD；受害指令在延迟槽时EPC为其PC−4且BD=1，否则EPC为其PC且BD=0。普通分支/跳转保留延迟槽，eret无延迟槽。新CP0寄存器的读写亦须保持程序顺序；本题特例与优先级缺项另行说明。\n\n",
+      "## 出处与资料缺项\n\n- 来源：[kie-chi](https://kie-chi.com/2024/12/08/CO_P7/)、[UHO](https://theuho.site/2024/12/11/COexamP7/)。\n- DomainHi上界：正文“超过”指向闭区间，示例代码Addr>=DomainHi指向半开区间，二者冲突。成功撤销后是否清除hasSW、是否把撤销自身当成新sw并更新ChangeData，也未说明，连续withdraw行为无法还原。新增CP0复位值/编号和对非DM sw的记录范围亦未记录。\n- withdraw与lww存在语义耦合，见[P7_lww_2024_blog](../P7_lww_2024_blog/P7_lww_2024_blog.md)。不根据作者一句“不需要暂停”取消实际CP0/内存相关检查。\n",
+      "2026-11-17 从可见文本移出的维护说明：\n\n博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。\n\n`withdraw`为来源记录的指令名；没有可确认的opcode/funct与新增CP0寄存器编号。\n\n来源保证上下界在0x0000..0x3000且字对齐。未成功提交的sw不能留下已完成存储的历史，异常受害指令及年轻指令不能改变内存或撤销记录。withdraw成功时具有一次整字store的内存写效果。"
+    ],
+    "solution": [
+      "2026-11-17 从可见文本移出的维护说明：\n\n> 项目：P7 ｜ 指令：withdraw ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[kie-chi](https://kie-chi.com/2024/12/08/CO_P7/)、[UHO](https://theuho.site/2024/12/11/COexamP7/)\n\nDomainHi上界：正文“超过”指向闭区间，示例代码Addr>=DomainHi指向半开区间，二者冲突。成功撤销后是否清除hasSW、是否把撤销自身当成新sw并更新ChangeData，也未说明，连续withdraw行为无法还原。新增CP0复位值/编号和对非DM sw的记录范围亦未记录。\n\n这些缺项影响行为，题解不以自选约定填补。\n\n此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。\n"
+    ]
+  },
+  "completion": {
+    "date": "2026-11-17",
+    "conditions": [
+      "采用DomainLo≤ChangeAddr<DomainHi的无符号半开域；上下界、CP0编号、访问权限和复位值按撤销状态表。",
+      "历史仅记录成功的普通DM sw。撤销成功后消费历史且不把撤销当作新sw；无历史无操作，失败保留历史。后续其他字节/半字写入不更新旧历史，故撤销仍恢复被记录sw之前的完整字。",
+      "withdraw不写GPR，不产生跳转；域失败为AdES（ExcCode=5），撤销地址来自有效DM sw，已保证字对齐且在DM内。",
+      "撤销状态由下表定义，均为32位。名称在操作中作为对应CP0寄存器的别名。\n\n| 名称 | CP0编号 | mfc0 | mtc0 | 复位值 |\n| --- | --- | --- | --- | --- |\n| DomainLo | 18 | 读全部32位 | 写全部32位 | 0x00000000 |\n| DomainHi | 19 | 读全部32位 | 写全部32位 | 0x00003000 |\n| ChangeAddr | 20 | 读全部32位 | 忽略写入 | 0x00000000 |\n| ChangeData | 21 | 读全部32位 | 忽略写入 | 0x00000000 |\n\n另有内部一位hasSW，复位为false，不能由mfc0/mtc0访问。DomainLo、DomainHi写入值保证字对齐并处于0x0000至0x3000，且每次写入后DomainLo≤DomainHi。域是无符号半开区间[DomainLo, DomainHi)，上下界相等时为空域。\n\n只有成功提交、有效地址在0x0000至0x2ffc的普通sw建立历史：先将该地址原有整字与地址原子记录，再完成sw，并置hasSW为true。后续符合条件的sw覆盖唯一历史；sb、sh、对外设的sw、withdraw和lww自身均不更新历史，也不清除历史。sw即使写入值与旧字相同也记录。\n\n成功撤销将hasSW清为false，ChangeAddr和ChangeData保留最近记录值；连续撤销只有第一次有效。没有历史时直接无操作，不作域检查；域检查失败时产生AdES，保留历史。异常、中断和eret均不自动清除或切换历史；处理程序内的普通DM sw同样会覆盖历史。域寄存器修改不改历史，只影响此后撤销的检查。",
+      "GPR、PC及本题CP0寄存器均为32位，源值取本指令执行前的程序顺序状态；GPR[0]恒为0，对其写回被忽略。普通顺序PC增加4；普通分支和跳转保留一条延迟槽，eret无延迟槽，控制转移不放在另一条控制转移的延迟槽中。\n\n按程序顺序处理异常和副作用。在宏观PC边界，满足SR.IE=1、SR.EXL=0且至少一个HWInt与SR.IM对应位同为1的外部中断优先于所有同步异常，ExcCode=0。获准异常或中断统一置SR.EXL为1并跳至0x4180；受害指令不在延迟槽时EPC记录其PC且BD=0，在延迟槽时EPC记录其PC−4且BD=1，不论前一分支是否跳转。较老指令正常完成；受害及年轻指令不得留下GPR、本题CP0、DM、外设或撤销历史副作用。课程MDU特例保留：已改变的受害MDU状态无需回滚，尚未改变状态的年轻MDU指令不得启动或写HI/LO。输入保证异常处理程序不再产生异常，不要求嵌套处理。\n\n所有新增CP0读写、sw记录和撤销提交保持程序顺序。较早mtc0对后续域检查生效，较早sw的历史对后续撤销生效；流水线可暂停或转发，不能读取陈旧配置。",
+      "withdraw无寄存器操作数，编码位25..6不参与运算。取指PC未字对齐或不在0x3000至0x6ffc时产生取指AdEL，优先于本指令的撤销域异常。"
+    ]
+  }
+}

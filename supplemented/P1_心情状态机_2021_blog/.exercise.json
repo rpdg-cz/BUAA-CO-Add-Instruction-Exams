@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P1",
+    "year": "2021",
+    "type": "博客整理",
+    "author": "Xlucidator",
+    "url": "https://www.cnblogs.com/xlucidator/p/15474996.html",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P1_心情状态机_2021_blog\n\n> 项目：P1 ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[Xlucidator](https://www.cnblogs.com/xlucidator/p/15474996.html)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n**收录状态：残题。** 完整状态集合、输入编码、每条转移的计时阈值、复位初态、输出接口和同时满足多条件时的优先级均未保存。IDEA/BUSY 是题解片段中的符号，不足以补全全题。\n",
+      "用 Verilog 实现时序状态机。某些状态在连续 n 个时钟周期未受到指定输入打断后转移；打断输入也可能触发状态转移。来源题解给出一个分支：输入为 IDEA 时转入 BUSY，并清零该段计时器。",
+      "计时量表示当前连续未被打断的周期数，若打断导致重新开始计时，应清零而不能保留上一段的累计值。具体阈值及状态转移优先级仍须原题确定；使用非阻塞赋值时，判断读取的是时钟沿到来前的旧值。"
+    ],
+    "solution": [
+      "> 项目：P1 ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[Xlucidator](https://www.cnblogs.com/xlucidator/p/15474996.html)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。",
+      "## 可确定的实现原则",
+      "## 未决限制",
+      "具体 T、状态集合及打断/超时的优先级未给出，不能把示例 IDEA→BUSY 外推为完整状态机。实现必须在原规则恢复后逐条验证各分支，而不是仅补一个通用计数器。"
+    ]
+  },
+  "completion": {
+    "date": "2026-11-17",
+    "conditions": [
+      "输入 clk、同步高有效 reset、evt[1:0]；输出 mood[1:0]。事件编码 00=NONE、01=IDEA、10=REST、11=PRAISE；状态编码 00=IDLE、01=BUSY、10=HAPPY、11=TIRED。运行先复位，复位优先并令 mood=IDLE、计时器=0，复位沿不消费事件。",
+      "每个普通 clk 上升沿先处理事件：任何状态收到 IDEA 都转 BUSY，REST 都转 IDLE，PRAISE 都转 HAPPY，并清零连续计时器；包括事件目标与当前状态相同时也重新计时。事件优先于同沿的超时。",
+      "仅 NONE 计入连续未打断周期：BUSY 连续 3 个 NONE 后转 TIRED；HAPPY 连续 2 个 NONE 后转 IDLE；TIRED 连续 2 个 NONE 后转 IDLE；IDLE 收到 NONE 保持。每次超时转移清零计时器，进入状态的事件沿不算一个 NONE。mood 沿后立即反映新状态。"
+    ]
+  }
+}

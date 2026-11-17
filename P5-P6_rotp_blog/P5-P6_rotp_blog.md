@@ -1,0 +1,36 @@
+# P5-P6_rotp_blog
+
+## 题目：rotp（Rotate by Parity）
+
+## 编码
+
+| 31..26 | 25..21 | 20..16 | 15..11 | 10..6 | 5..0 |
+| --- | --- | --- | --- | --- | --- |
+| xxxxxx | rs | rt | rd | xxxxx | xxxxxx |
+
+## 格式
+
+`rotp rd, rs, rt`
+
+## 描述
+
+移位量取GPR[rt]的低五位。GPR[rt]为奇数时，将GPR[rs]循环左移；为偶数时循环右移，结果写入GPR[rd]。
+
+## 操作
+
+<pre>
+temp ← GPR[rs]
+n ← GPR[rt]<sub>4..0</sub>
+for i in 1 .. n
+    if GPR[rt]<sub>0</sub> = 1 then
+        temp ← temp<sub>30..0</sub> || temp<sub>31</sub>
+    else
+        temp ← temp<sub>0</sub> || temp<sub>31..1</sub>
+    endif
+endfor
+GPR[rd] ← temp
+</pre>
+
+## 限制与异常
+
+n=0时结果等于原GPR[rs]。移出的位从另一端补入。

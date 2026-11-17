@@ -52,7 +52,7 @@ test('Pre、P0–P7 与 P5-P6 阶段可排序，博客来源不会伪造课程�
   const originalLink = store.createExercise(root, { id: 'Pre_来源_2022_blog', statement: '# 来源\n原始链接：https://example.invalid/original\n题目 ID：99\n来源 PieId：88\n' });
   assert.equal(originalLink.source.url, 'https://example.invalid/original');
   const proposal = store.createExercise(root, {
-    id: 'P7_自拟资料_2024_blog', status: 'incomplete',
+    id: 'P7_自拟资料_2024_blog', status: 'supplemented',
     statement: '# 资料\n\n> 类型：博主自拟设想（非考题记录） ｜ 来源：[作者](https://example.invalid/proposal)\n',
   });
   assert.equal(proposal.source.provenance, 'proposal');
@@ -78,41 +78,41 @@ test('中文博客及题解完整 CRUD，纯题面编辑和双向移档不会产
   assert.equal(fs.readFileSync(store.readAttachment(root, ID, '中文题解.md'), 'utf8'), '# 题解\n\n完整中文推导。\n');
   store.saveAttachment(root, ID, '中文题解.md', Buffer.from('# 修订题解\n'));
   assert.equal(fs.readFileSync(store.readAttachment(root, ID, '中文题解.md'), 'utf8'), '# 修订题解\n');
-  for (const status of ['incomplete', 'complete', 'incomplete']) {
+  for (const status of ['supplemented', 'complete', 'supplemented']) {
     const statement = `${STATEMENT}\n状态：${status}\n`;
     const result = store.updateExercise(root, ID, { statement, status });
-    const relativePath = status === 'incomplete' ? `incomplete/${ID}` : ID;
+    const relativePath = status === 'supplemented' ? `supplemented/${ID}` : ID;
     assert.equal(result.status, status);
     assert.equal(result.relativePath, relativePath);
     assert.equal(result.hasScript, false);
     assert.equal(result.scriptFile, null);
     assert.deepEqual(fs.readdirSync(path.join(root, relativePath)).sort(), [`${ID}.md`, '中文题解.md'].sort());
     assert.equal(store.readExercise(root, ID).statement, statement);
-    assert.equal(fs.existsSync(path.join(root, status === 'incomplete' ? ID : `incomplete/${ID}`)), false);
+    assert.equal(fs.existsSync(path.join(root, status === 'supplemented' ? ID : `supplemented/${ID}`)), false);
     assert.equal(fs.readFileSync(store.readAttachment(root, ID, '中文题解.md'), 'utf8'), '# 修订题解\n');
   }
   store.deleteAttachment(root, ID, '中文题解.md');
   assert.deepEqual(store.readExercise(root, ID).attachments, []);
   const deleted = store.deleteExercise(root, ID);
-  assert.equal(deleted.relativePath, `incomplete/${ID}`);
-  assert.equal(fs.existsSync(path.join(root, 'incomplete', ID)), false);
+  assert.equal(deleted.relativePath, `supplemented/${ID}`);
+  assert.equal(fs.existsSync(path.join(root, 'supplemented', ID)), false);
   assert.deepEqual(store.listExercises(root), []);
 });
 
-test('纯题面默认创建、归档创建及无脚本更新均不造 instruction.ts', t => {
+test('纯题面默认创建、补全分类创建及无脚本更新均不造 instruction.ts', t => {
   const root = fixture(t);
-  for (const status of ['complete', 'incomplete']) {
+  for (const status of ['complete', 'supplemented']) {
     const id = `P0_无脚本_${status}_blog`;
     const created = store.createExercise(root, { id, status });
     assert.equal(created.hasScript, false);
     assert.equal(created.scriptName, null);
     assert.equal(created.scriptLanguage, null);
-    assert.equal(created.relativePath, status === 'incomplete' ? `incomplete/${id}` : id);
+    assert.equal(created.relativePath, status === 'supplemented' ? `supplemented/${id}` : id);
     assert.doesNotMatch(store.readExercise(root, id).statement, /instruction\.ts|脚本文件/);
     store.updateExercise(root, id, { statement: '# 仅题面修订\n' });
     assert.deepEqual(fs.readdirSync(path.join(root, created.relativePath)), [`${id}.md`]);
     for (const payload of [{ script: '' }, { scriptLanguage: 'ts' }, { scriptName: 'instruction' }]) {
-      unchanged(root, () => store.updateExercise(root, id, { statement: '# 不应落盘\n', status: status === 'complete' ? 'incomplete' : 'complete', ...payload }));
+      unchanged(root, () => store.updateExercise(root, id, { statement: '# 不应落盘\n', status: status === 'complete' ? 'supplemented' : 'complete', ...payload }));
     }
   }
 });
@@ -120,66 +120,87 @@ test('纯题面默认创建、归档创建及无脚本更新均不造 instructio
 test('非法状态、越界路径和重复 ID 在任何文件落盘前拒绝', t => {
   const root = fixture(t);
   store.createExercise(root, { id: ID, statement: STATEMENT });
-  for (const status of ['', 'archived', 'INCOMPLETE', '../incomplete', null]) {
+  for (const status of ['', 'archived', 'incomplete', 'SUPPLEMENTED', '../supplemented', null]) {
     unchanged(root, () => store.createExercise(root, { id: 'P0_不应创建_blog', status, statement: '# 不应落盘\n' }));
     unchanged(root, () => store.updateExercise(root, ID, { status, statement: '# 不应落盘\n' }));
   }
-  for (const id of ['../外部', 'incomplete/题目', 'incomplete\\题目', '..', 'incomplete', 'COM¹', 'COM².txt', 'com³', 'LPT¹', 'LPT².md', 'lpt³']) {
-    unchanged(root, () => store.createExercise(root, { id, status: 'incomplete', statement: '# 不应落盘\n' }));
+  for (const id of ['../外部', 'supplemented/题目', 'supplemented\\题目', '..', 'incomplete', 'supplemented', 'COM¹', 'COM².txt', 'com³', 'LPT¹', 'LPT².md', 'lpt³']) {
+    unchanged(root, () => store.createExercise(root, { id, status: 'supplemented', statement: '# 不应落盘\n' }));
     unchanged(root, () => store.updateExercise(root, id, { statement: '# 不应落盘\n' }));
   }
   for (const name of ['../题解.md', '目录/题解.md', '目录\\题解.md', 'COM¹', 'COM².txt', 'com³', 'LPT¹', 'LPT².md', 'lpt³']) {
     unchanged(root, () => store.saveAttachment(root, ID, name, Buffer.from('不应落盘')));
   }
-  unchanged(root, () => store.createExercise(root, { id: ID, status: 'incomplete', statement: '# 重复\n' }), 409);
-  fs.mkdirSync(path.join(root, 'incomplete', ID), { recursive: true });
-  fs.writeFileSync(path.join(root, 'incomplete', ID, `${ID}.md`), '# 重复归档\n');
+  unchanged(root, () => store.createExercise(root, { id: ID, status: 'supplemented', statement: '# 重复\n' }), 409);
+  fs.mkdirSync(path.join(root, 'supplemented', ID), { recursive: true });
+  fs.writeFileSync(path.join(root, 'supplemented', ID, `${ID}.md`), '# 重复补全\n');
   for (const action of [
     () => store.listExercises(root), () => store.readExercise(root, ID),
     () => store.createExercise(root, { id: ID, statement: '# 不应落盘\n' }),
-    () => store.updateExercise(root, ID, { status: 'incomplete', statement: '# 不应落盘\n' }),
+    () => store.updateExercise(root, ID, { status: 'supplemented', statement: '# 不应落盘\n' }),
     () => store.deleteExercise(root, ID),
     () => store.saveAttachment(root, ID, '中文题解.md', Buffer.from('不应落盘')),
   ]) unchanged(root, action, 409);
 });
 
-test('归档根 junction 拒绝所有浏览和写操作，外部目录保持原样', t => {
+test('旧 incomplete 容器保持保留名，不被当作题目或扫描其子目录', t => {
+  const root = fixture(t);
+  const legacy = path.join(root, 'incomplete');
+  fs.mkdirSync(path.join(legacy, 'P5_旧记录_blog'), { recursive: true });
+  fs.writeFileSync(path.join(legacy, 'incomplete.md'), '# 旧容器不能成为题目\n');
+  fs.writeFileSync(path.join(legacy, 'P5_旧记录_blog', 'P5_旧记录_blog.md'), '# 旧记录\n');
+  store.createExercise(root, { id: ID, status: 'supplemented', statement: STATEMENT });
+  assert.deepEqual(store.listExercises(root).map(row => row.id), [ID]);
+  const before = snapshot(root);
+  for (const id of ['incomplete', 'supplemented']) {
+    for (const action of [
+      () => store.readExercise(root, id),
+      () => store.createExercise(root, { id, statement: '# 不能创建\n' }),
+      () => store.updateExercise(root, id, { statement: '# 不能覆盖\n' }),
+      () => store.deleteExercise(root, id),
+      () => store.readAttachment(root, id, 'incomplete.md'),
+    ]) assert.throws(action, error => error instanceof store.AppError && error.status === 400);
+  }
+  assert.deepEqual(snapshot(root), before);
+});
+
+test('补全目录 junction 拒绝所有浏览和写操作，外部目录保持原样', t => {
   const root = fixture(t);
   const outside = fixture(t);
   store.createExercise(root, { id: ID, statement: STATEMENT });
   fs.writeFileSync(path.join(outside, '人工文件.md'), '# 外部文件\n');
-  fs.symlinkSync(outside, path.join(root, 'incomplete'), process.platform === 'win32' ? 'junction' : 'dir');
+  fs.symlinkSync(outside, path.join(root, 'supplemented'), process.platform === 'win32' ? 'junction' : 'dir');
   const before = snapshot(outside);
   for (const action of [
     () => store.listExercises(root), () => store.readExercise(root, ID),
-    () => store.createExercise(root, { id: 'Pre_不应创建_blog', status: 'incomplete' }),
-    () => store.updateExercise(root, ID, { status: 'incomplete', statement: '# 不应落盘\n' }),
+    () => store.createExercise(root, { id: 'Pre_不应创建_blog', status: 'supplemented' }),
+    () => store.updateExercise(root, ID, { status: 'supplemented', statement: '# 不应落盘\n' }),
     () => store.deleteExercise(root, ID),
     () => store.saveAttachment(root, ID, '中文题解.md', Buffer.from('不应落盘')),
   ]) unchanged(root, action);
   assert.deepEqual(snapshot(outside), before);
 });
 
-test('README 新表格纳入全部归档题的真实路径和状态，并完整保留人工尾段', t => {
+test('README 新表格纳入全部补全题的真实路径和状态，并完整保留人工尾段', t => {
   const root = fixture(t);
   const suffix = '\n\n## 人工补充\n\n保留中文说明与空行。\n\n| 人工 | 表格 |\n| --- | --- |\n| 保留 | 内容 |\n';
   fs.writeFileSync(path.join(root, 'README.md'), `# 题库\n\n## 题目索引\n\n| 练习 | 阶段 | TS 脚本 | 原始附件 |\n| --- | --- | --- | --- |${suffix}`);
-  const archived = ['Pre_练习_2021_blog', 'P0_电路_2022_blog', ID];
-  for (const id of archived) {
-    store.createExercise(root, { id, status: 'incomplete', statement: '# 归档题\n' });
+  const supplemented = ['Pre_练习_2021_blog', 'P0_电路_2022_blog', ID];
+  for (const id of supplemented) {
+    store.createExercise(root, { id, status: 'supplemented', statement: '# 补全题\n' });
     store.saveAttachment(root, id, '中文题解.md', Buffer.from('# 题解\n'));
   }
   store.createExercise(root, { id: 'P7_完整', scriptName: 'demo', scriptLanguage: 'js', statement: '# 完整课程题\n' });
   const result = readme.syncReadme(root, store.listExercises(root));
   assert.ok(result.content.includes(readme.TABLE_HEADER));
   assert.ok(result.content.endsWith(suffix));
-  assert.deepEqual(new Set(result.added), new Set([...archived, 'P7_完整']));
-  for (const id of archived) {
+  assert.deepEqual(new Set(result.added), new Set([...supplemented, 'P7_完整']));
+  for (const id of supplemented) {
     const row = result.content.split('\n').find(line => line.startsWith(`| [${id}]`));
     assert.ok(row, id);
-    assert.ok(row.includes(`(${`incomplete/${id}/${id}.md`})`), row);
-    assert.ok(row.includes(`(incomplete/${id}/中文题解.md)`), row);
-    assert.ok(row.includes('| 残题 | 博客整理 | 无 |'), row);
+    assert.ok(row.includes(`(${`supplemented/${id}/${id}.md`})`), row);
+    assert.ok(row.includes(`(supplemented/${id}/中文题解.md)`), row);
+    assert.ok(row.includes('| 残题补全 | 博客整理 | 无 |'), row);
   }
   assert.ok(result.content.includes('[demo.js](P7_完整/demo.js)'));
   assert.ok(result.content.includes('| P7 | 行为完整 | 课程题库 |'));
@@ -201,15 +222,15 @@ function request(base, pathname, { method = 'GET', body, headers = {} } = {}) {
   });
 }
 
-test('真实博客题库的每份题面及题解均可通过管理 HTTP 读取，包含归档与中文路径', async () => {
+test('真实博客题库的每份题面及题解均可通过管理 HTTP 读取，包含补全分类与中文路径', async () => {
   const root = path.resolve(__dirname, '../../..');
   const expected = [];
-  for (const parent of [root, path.join(root, 'incomplete')]) {
+  for (const parent of [root, path.join(root, 'supplemented')]) {
     if (!fs.existsSync(parent)) continue;
     for (const entry of fs.readdirSync(parent, { withFileTypes: true })) {
       if (entry.isDirectory() && entry.name.endsWith('_blog')) expected.push({
         id: entry.name, directory: path.join(parent, entry.name),
-        status: parent === root ? 'complete' : 'incomplete',
+        status: parent === root ? 'complete' : 'supplemented',
       });
     }
   }
@@ -268,12 +289,12 @@ test('同源 HTTP 保留完整中文题面与题解，支持创建、上传、�
     assert.ok(download.headers['content-disposition'].includes(`filename*=UTF-8''${encodeURIComponent('中文题解.md')}`));
     const html = JSON.parse((await request(base, route)).body).exercise.html;
     assert.ok(html.includes(attachment), html);
-    for (const status of ['incomplete', 'complete', 'incomplete']) {
+    for (const status of ['supplemented', 'complete', 'supplemented']) {
       const statement = `${STATEMENT}\nHTTP 修订：${status}\n`;
       const update = await request(base, route, { method: 'PUT', headers: json, body: JSON.stringify({ status, statement }) });
       assert.equal(update.status, 200, update.body);
       const meta = JSON.parse(update.body).exercise;
-      assert.equal(meta.relativePath, status === 'incomplete' ? `incomplete/${ID}` : ID);
+      assert.equal(meta.relativePath, status === 'supplemented' ? `supplemented/${ID}` : ID);
       assert.equal(meta.hasScript, false);
       assert.equal(JSON.parse((await request(base, route)).body).exercise.statement, statement);
       download = await request(base, attachment);
@@ -284,7 +305,7 @@ test('同源 HTTP 保留完整中文题面与题解，支持创建、上传、�
     assert.equal(replace.status, 200, replace.body);
     assert.equal((await request(base, attachment)).body, '# 中文题解修订\n');
     assert.equal((await request(base, '/api/readme', { method: 'POST', headers })).status, 200);
-    assert.ok(fs.readFileSync(path.join(root, 'README.md'), 'utf8').includes(`(incomplete/${ID}/中文题解.md)`));
+    assert.ok(fs.readFileSync(path.join(root, 'README.md'), 'utf8').includes(`(supplemented/${ID}/中文题解.md)`));
     const remove = await request(base, attachment, { method: 'DELETE', headers });
     assert.equal(remove.status, 200, remove.body);
     assert.equal((await request(base, attachment)).status, 404);

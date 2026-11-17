@@ -32,14 +32,14 @@ function browserHarness(fetch) {
     window: {}, location: {}, navigator: {}, fetch,
     setTimeout() {}, clearTimeout() {},
   });
-  vm.runInContext(`${appSource}\nglobalThis.ui = { state, el, api, selectExercise, openEditor, saveEditor, uploadFiles, visibleExercises, sourceBlock };`, context);
+  vm.runInContext(`${appSource}\nglobalThis.ui = { state, el, api, selectExercise, openEditor, saveEditor, uploadFiles, visibleExercises, sourceBlock, renderList, renderDetail };`, context);
   return { ...context.ui, elements };
 }
 
 const jsonResponse = (data) => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => data });
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test('blog and incomplete filters preserve source identity, and document-only edits omit script fields', async () => {
+test('original blog and supplemented filters distinguish completed exercises and keep document-only edits script-free', async () => {
   const requests = [];
   const item = { id: 'P0_中文题_2024_blog', stage: 'P0', status: 'complete', statement: '# 中文题\n', files: [],
     source: { kind: 'blog', author: '作者', year: '2024', url: 'https://example.invalid/blog' } };
@@ -50,18 +50,54 @@ test('blog and incomplete filters preserve source identity, and document-only ed
   await settle();
   ui.state.exercises = [item,
     { id: 'P5_course', stage: 'P5', status: 'complete', source: { kind: 'course' } },
-    { id: 'P7_残题_blog', stage: 'P7', status: 'incomplete', source: { kind: 'blog' } }];
+    { id: 'P7_残题_blog', stage: 'P7', status: 'supplemented', source: { kind: 'blog' } }];
   ui.state.filters.category = 'blog';
   assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), [item.id]);
-  ui.state.filters.category = 'incomplete';
+  ui.state.filters.category = 'supplemented';
   assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), ['P7_残题_blog']);
   assert.match(ui.sourceBlock(item.source), /查看来源博客/);
   assert.doesNotMatch(ui.sourceBlock(item.source), /ProblemId/);
   ui.openEditor('edit', item);
-  ui.el.fieldStatus.value = 'incomplete';
+  ui.el.fieldStatus.value = 'supplemented';
   await ui.saveEditor();
   const payload = JSON.parse(requests.find(row => row.options?.method === 'PUT').options.body);
-  assert.deepEqual(payload, { statement: item.statement, status: 'incomplete' });
+  assert.deepEqual(payload, { statement: item.statement, status: 'supplemented' });
+});
+
+test('列表与详情区分原完整博客题和残题补全，补全自拟资料仍明确非考题', async () => {
+  const ui = browserHarness(async () => jsonResponse({ exercises: [] }));
+  await settle();
+  const original = { id: 'P5_原完整_blog', stage: 'P5', status: 'complete', source: { kind: 'blog', author: '原作者' }, files: [] };
+  const supplemented = { id: 'P5_补全_blog', stage: 'P5', status: 'supplemented', source: { kind: 'blog', author: '补全作者', provenance: 'recollection' }, files: [] };
+  const proposal = { ...supplemented, id: 'P5_lww_blog', source: { ...supplemented.source, provenance: 'proposal' } };
+  ui.state.exercises = [original, supplemented, proposal];
+  ui.renderList();
+  const rows = ui.el.list.innerHTML.split('<li data-id=').slice(1);
+  assert.doesNotMatch(rows[0], /残题补全/);
+  assert.match(rows[1], /残题补全/);
+  assert.match(rows[2], /残题补全/);
+  assert.match(rows[2], /博主自拟资料（非考题）/);
+  ui.state.detail = original;
+  ui.renderDetail();
+  assert.match(ui.el.detail.innerHTML, /行为完整 · 博客整理/);
+  assert.doesNotMatch(ui.el.detail.innerHTML, /残题补全/);
+  for (const item of [supplemented, proposal]) {
+    ui.state.detail = item;
+    ui.renderDetail();
+    assert.match(ui.el.detail.innerHTML, /残题补全 · 博客整理/);
+    assert.doesNotMatch(ui.el.detail.innerHTML, /行为残缺|关键行为未还原|残缺参考资料/);
+  }
+  assert.match(ui.el.detail.innerHTML, /博主自拟资料 · 非考题/);
+  ui.state.filters.category = 'blog';
+  assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), [original.id]);
+  ui.state.filters.category = 'supplemented';
+  assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), [supplemented.id, proposal.id]);
+  ui.state.filters.category = '';
+  ui.state.filters.search = '残题补全';
+  assert.deepEqual(Array.from(ui.visibleExercises(), row => row.id), [supplemented.id, proposal.id]);
+  const page = fs.readFileSync(path.join(webRoot, 'public', 'index.html'), 'utf8');
+  assert.match(page, /value="blog">博客题（原完整题）/);
+  assert.match(page, /value="supplemented">残题补全（已补齐解题条件）/);
 });
 
 test('real course Markdown preserves tables and maps its existing class attachment', () => {

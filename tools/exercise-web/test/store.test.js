@@ -165,7 +165,7 @@ test('大小写改名时暂存写入或安装失败会恢复原脚本，不丢�
 
 test('隐藏、保留目录和 Windows 非法名称不进入任何题目读写接口', (t) => {
   const { root } = fixture(t);
-  const names = ['tools', 'TOOLS', 'node_modules', 'NODE_MODULES', '.private'];
+  const names = ['tools', 'TOOLS', 'node_modules', 'NODE_MODULES', 'incomplete', 'INCOMPLETE', 'supplemented', 'SUPPLEMENTED', '.private'];
   for (const name of names) {
     const dir = path.join(root, name);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);

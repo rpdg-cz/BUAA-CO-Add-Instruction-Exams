@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P7",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "UHO",
+    "url": "https://theuho.site/2024/12/11/COexamP7/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P7_Watch异常_2024_blog\n\n> 项目：P7 ｜ 指令：Watch异常机制（非新增指令） ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[UHO](https://theuho.site/2024/12/11/COexamP7/)\n>\n> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：残题：指令行为尚不能唯一还原。\n\n",
+      "## 课程语义\n\n按P7 CP0规范（本地课程教程：`P7/implement/P7-2-3.md`）及精确异常规则（本地课程教程：`P7/implement/P7-2-4.md`），异常/中断请求获准提交时统一进入0x4180，受害指令及年轻指令不得留下GPR、HI/LO、内存或外设副作用，较老指令正常完成。记录受害PC及BD；受害指令在延迟槽时EPC为其PC−4且BD=1，否则EPC为其PC且BD=0。普通分支/跳转保留延迟槽，eret无延迟槽。新CP0寄存器的读写亦须保持程序顺序；本题特例与优先级缺项另行说明。\n\n",
+      "## 出处与资料缺项\n\n- 来源：[UHO](https://theuho.site/2024/12/11/COexamP7/)。\n- 原文“对于DM异常”之后却写“IMWatch优先级低于取数存数AdEL/AdES”，与前一句IMWatch优先级说明冲突。若后一句实指DMWatch，则可形成一致规则，但未经证据不能把该推测冒充原题。需核定同一指令同时IMWatch和数据地址错误时的优先级。\n- 已将原文Watch[1]统一校为WatchHi[1]（上下文唯一对应）；IM/DM异常优先级错误涉及实际行为，保留为待核项，不作无依据修补。\n",
+      "2026-11-17 从可见文本移出的维护说明：\n\n博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。\n\n监视地址不要求字或半字对齐，不能只将有效地址与D直接比较。PC地址未对齐/越界的AdEL优先于IMWatch。来源首句又称IMWatch高于其他异常，但后文将其写为低于取数存数AdEL/AdES，见资料缺项。"
+    ],
+    "solution": [
+      "2026-11-17 从可见文本移出的维护说明：\n\n> 项目：P7 ｜ 指令：Watch异常机制（非新增指令） ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[UHO](https://theuho.site/2024/12/11/COexamP7/)\n\n原文“对于DM异常”之后却写“IMWatch优先级低于取数存数AdEL/AdES”，与前一句IMWatch优先级说明冲突。若后一句实指DMWatch，则可形成一致规则，但未经证据不能把该推测冒充原题。需核定同一指令同时IMWatch和数据地址错误时的优先级。\n\n这些缺项影响行为，题解不以自选约定填补。\n\n此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。\n"
+    ]
+  },
+  "completion": {
+    "date": "2026-11-17",
+    "conditions": [
+      "WatchLo和WatchHi均在复位时为0，支持全部32位读写；WatchHi位4至31保留写入值但不参与判定。mtc0的配置从该指令成功提交后生效，不反过来改变该mtc0自身的Watch判定。",
+      "监视地址均为16位字段零扩展后的字节地址；IMWatch只比较当前指令PC是否恰等于iAddr，不比较整条指令覆盖的四个字节。DMWatch比较当前访存实际覆盖的全部字节，允许dAddr不对齐。",
+      "同一指令的同步异常优先级从高到低为：取指AdEL、IMWatch、RI、Syscall、Ov、取数AdEL或存数AdES、DMWatch。IMWatch和DMWatch的ExcCode均为23；取指AdEL不再解析该地址的指令。不同指令始终先处理程序顺序中较老者。",
+      "可响应外部中断优先于上述全部同步异常，ExcCode=0。SR.EXL=1时屏蔽Watch，不要求异常嵌套；输入保证处理程序不产生其他同步异常。",
+      "有效数据地址按课程进行16位符号字节偏移加法；load/store的地址加法溢出、对齐错误及映射错误为AdEL/AdES。合法范围为DM 0x0000..0x2fff、Timer0 0x7f00..0x7f0b、Timer1 0x7f10..0x7f1b、中断发生器0x7f20..0x7f23；Timer只允许整字访问，写Count寄存器为AdES。",
+      "每个覆盖地址vAddr+i以至少33位整数计算，不回绕到0；地址错误优先于DMWatch，故失败的访问不产生数据副作用。IMWatch即使命中访存地址错误指令，也按较高优先级报告23。",
+      "Watch受害指令及所有年轻指令不得留下GPR、CP0、HI/LO、DM或外设副作用；受害乘除指令不得启动乘除，也不能修改忙状态，早于受害指令的乘除可正常完成。",
+      "获准中断或异常统一置SR.EXL为1、进入0x4180；受害指令非延迟槽时EPC=该指令PC且BD=0，延迟槽时EPC=该指令PC−4且BD=1，普通分支无论是否跳转都标记其延迟槽，eret无延迟槽。",
+      "GPR、PC、Watch寄存器均为32位；配置与访存数据按程序顺序取得，前序mtc0必须转发或等待。普通顺序PC增加4；控制转移不放在另一控制转移的延迟槽中。"
+    ]
+  }
+}

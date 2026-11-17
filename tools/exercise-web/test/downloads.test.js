@@ -210,7 +210,7 @@ test('真实 HTTP：等待下载关闭的移档先完成，后到下载按新位
     const move = request(base, route, { method: 'PUT', headers: {
       'X-Requested-With': 'exercise-web', Origin: base, 'Sec-Fetch-Site': 'same-origin',
       'Content-Type': 'application/json',
-    }, body: JSON.stringify({ status: 'incomplete' }) });
+    }, body: JSON.stringify({ status: 'supplemented' }) });
     await moveSeen.promise;
     await checkpoint();
     assert.equal(moved, false);
@@ -221,11 +221,11 @@ test('真实 HTTP：等待下载关闭的移档先完成，后到下载按新位
     allowClose.resolve();
     const [moveResponse, lateResponse] = await Promise.all([move, lateRead]);
     assert.equal(moveResponse.status, 200, moveResponse.body);
-    assert.equal(JSON.parse(moveResponse.body).exercise.relativePath, `incomplete/${id}`);
+    assert.equal(JSON.parse(moveResponse.body).exercise.relativePath, `supplemented/${id}`);
     assert.equal(lateResponse.status, 200, lateResponse.body);
     assert.equal(lateResponse.body, solution);
     assert.equal(moved, true);
-    assert.deepEqual(opened, [oldTarget, path.join(root, 'incomplete', id, '中文题解.md')]);
+    assert.deepEqual(opened, [oldTarget, path.join(root, 'supplemented', id, '中文题解.md')]);
   } finally {
     allowClose.resolve();
     await new Promise(resolve => server.close(resolve));

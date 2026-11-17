@@ -26,7 +26,7 @@ function tableRow(exercise) {
     ? `[${exercise.scriptFile}](${base}/${exercise.scriptFile})`
     : '无';
   const proposal = exercise.source?.provenance === 'proposal';
-  return `| ${statement} | ${exercise.stage} | ${exercise.status === 'incomplete' ? proposal ? '资料残缺' : '残题' : '行为完整'} | ${proposal ? '博主自拟资料（非考题）' : exercise.source?.kind === 'blog' ? '博客整理' : '课程题库'} | ${script} | ${attachmentCell(exercise)} |`;
+  return `| ${statement} | ${exercise.stage} | ${exercise.status === 'supplemented' ? '残题补全' : '行为完整'} | ${proposal ? '博主自拟资料（非考题）' : exercise.source?.kind === 'blog' ? '博客整理' : '课程题库'} | ${script} | ${attachmentCell(exercise)} |`;
 }
 
 function buildTable(exercises) {

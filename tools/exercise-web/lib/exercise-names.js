@@ -2,7 +2,7 @@
 
 const { AppError } = require('./store-files');
 const NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{M}_.-]*$/u;
-const RESERVED_DIRS = new Set(['tools', 'node_modules', 'incomplete']);
+const RESERVED_DIRS = new Set(['tools', 'node_modules', 'incomplete', 'supplemented']);
 const DEVICE_NAME = /^(con|prn|aux|nul|com[1-9¹²³]|lpt[1-9¹²³])(?:\.|$)/i;
 
 function portableName(name, limit) {
