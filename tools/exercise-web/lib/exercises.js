@@ -8,6 +8,7 @@ const {
 const { assertExerciseId, assertScriptName, assertFileName } = require('./exercise-names');
 const { locateExercise, planRelocation, ensureParent, listExerciseIds, assertStatus } = require('./exercise-locations');
 const { stageOf, compareExercises, parseStatementSource } = require('./exercise-metadata');
+const { readExerciseSidecar } = require('./exercise-sidecar');
 
 function isScriptFile(name) {
   return /\.(js|ts)$/.test(name) && !name.endsWith('.d.ts');
@@ -81,6 +82,8 @@ function describeDirectory(root, id) {
   const statementText = statementFile
     ? fs.readFileSync(path.join(dir, statementFile.name), 'utf8')
     : '';
+  const inlineSource = parseStatementSource(statementText, id);
+  const sidecar = readExerciseSidecar(dir, inlineSource.kind);
 
   return {
     id,
@@ -90,7 +93,8 @@ function describeDirectory(root, id) {
     scriptName: scriptFile ? path.basename(scriptFile.name, path.extname(scriptFile.name)) : null,
     scriptLanguage: scriptFile ? path.extname(scriptFile.name).slice(1).toLowerCase() : null,
     title: readTitle(statementText, id),
-    source: parseStatementSource(statementText, id),
+    source: { ...inlineSource, ...sidecar.source },
+    metadataDiagnostic: sidecar.diagnostic,
     hasStatement: Boolean(statementFile),
     hasScript: Boolean(scriptFile),
     statementFile: statementFile ? statementFile.name : null,

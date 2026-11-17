@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P0",
+    "year": "2023",
+    "type": "博客整理",
+    "author": "Hugo",
+    "url": "https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P0_未出现的最小正整数_2023_blog\n\n> 项目：P0 ｜ 年份：2023 ｜ 类型：博客整理 ｜ 来源：[Hugo](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/)、[fysszlr](https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/)、[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n五输入及输出位宽来自 Hugo 的题意记录，无符号解释与 fysszlr 的器件设置说明一致。原信号名、模块名和 Appearance 未保存。\n"
+    ],
+    "solution": [
+      "> 项目：P0 ｜ 年份：2023 ｜ 类型：博客整理 ｜ 来源：[Hugo](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/)、[fysszlr](https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/)、[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。",
+      "也可以把每个输入先解码成表示数值是否出现的位掩码，再把五个掩码按位或，最后查找最低的缺失位。若掩码第 0 位代表数值 1，Bit Finder 得到的位置还要加 1；要留一位表示必然缺失的 6，避免未找到的特殊情况。",
+      "## 原记录修正与自查"
+    ]
+  }
+}

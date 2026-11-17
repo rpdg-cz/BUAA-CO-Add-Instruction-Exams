@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/11/12/CO/CO-p4-course/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_ES_2024_blog\n\n> 项目：P4 ｜ 指令：ES ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/12/CO/CO-p4-course/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\n本题不是同时写差值和跳转。分支目标的基准为本指令的 `P0+4`。\n\n",
+      "## 出处与资料缺项\n\n[owpeter](https://owpeter.github.io/2024/11/12/CO/CO-p4-course/)\n\n原博客 MathJax SVG 含完整操作，旧文本抽取曾遗漏。ES为文章第二条指令；未给独立测试集。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\n博客位域表：`101100 | rs(5) | rt(5) | offset(16)`。\n\n汇编语法未记录；I 型字段，`rt` 同时是源寄存器和非溢出分支的目的寄存器。"
+    ],
+    "solution": [
+      "> 项目：P4 ｜ 指令：ES ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/12/CO/CO-p4-course/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

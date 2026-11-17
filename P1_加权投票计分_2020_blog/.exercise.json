@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P1",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P1_加权投票计分_2020_blog\n\n> 项目：P1 ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)、[roife](https://roife.github.io/posts/buaa-co-lab-p1/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n来源表格把 np 写作“31 个普通人”，与 `[31:0]` 及题解中 32 次遍历矛盾；本页以两者一致的 32 位接口为准。原模块名未确定。\n"
+    ],
+    "solution": [
+      "> 项目：P1 ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)、[roife](https://roife.github.io/posts/buaa-co-lab-p1/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。"
+    ]
+  }
+}

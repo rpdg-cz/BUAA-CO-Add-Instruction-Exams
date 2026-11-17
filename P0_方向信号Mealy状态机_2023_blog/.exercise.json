@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P0",
+    "year": "2023",
+    "type": "博客整理",
+    "author": "Hugo",
+    "url": "https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P0_方向信号Mealy状态机_2023_blog\n\n> 项目：P0 ｜ 年份：2023 ｜ 类型：博客整理 ｜ 来源：[Hugo](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/)、[fysszlr](https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/)、[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n地图及方向编码已从 Hugo 原博客的[题面图片](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/3.png)逐格核对并转录，补齐原收录文本缺失的核心转移信息。信号名、Appearance、时钟沿与复位极性仍可按原接口另行适配。owpeter 题解另提到 hit，但本题面没有保存该接口，不擅自增加输出。\n"
+    ],
+    "solution": [
+      "> 项目：P0 ｜ 年份：2023 ｜ 类型：博客整理 ｜ 来源：[Hugo](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/)、[fysszlr](https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/)、[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。",
+      "## 可确定的实现原则",
+      "## 来源图核对与接口限制",
+      "题面已从原图补全棋盘与方向，按正文功能表即可构建具体 F。博客关于给 hit 加寄存器的建议涉及当前题面没有保存的输出，不能直接套用，更不能把 Mealy 的组合位置输出统一延迟一拍。应先取得题图和原接口，再判断各输出的对齐要求。"
+    ]
+  }
+}

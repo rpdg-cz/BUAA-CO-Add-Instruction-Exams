@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "jiangshiyi",
+    "url": "https://jiangshiyi0822.github.io/2024/11/25/BUAA-CO-P5习题分析/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_eam_2024_blog\n\n> 项目：P4 ｜ 指令：eam ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[jiangshiyi](https://jiangshiyi0822.github.io/2024/11/25/BUAA-CO-P5习题分析/)、[kie-chi](https://kie-chi.com/2024/11/13/CO_P4/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n> 整理状态：残题。已核对来源，现有证据不能唯一确定完整指令行为；以下仅整理可核实部分，不作为可独立实现的完整规格。\n\n",
+      "## 题目：有符号取模与条件扩展（来源冲突）\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\njiangshiyi文章用P5流水线分析P4题，不能以其实现形式推定原P4规则。\n\n",
+      "## 出处与资料缺项\n\n[jiangshiyi](https://jiangshiyi0822.github.io/2024/11/25/BUAA-CO-P5习题分析/)、[kie-chi](https://kie-chi.com/2024/11/13/CO_P4/)\n\n残题原因：两个来源对核心写回行为冲突，尚无原题/官方勘误能决定哪一版本正确；年份和轮次未由交叉材料确定，不擅自拆成两道不同年份题。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\njiangshiyi译码：`000000 | rs(5) | rt(5) | rd(5) | 未记录(5) | 111110`。\n\nkie-chi 给出 `eam rd, rs, rt`，R 型。",
+      "记号规范化时移出的维护说明（描述）：\n共同部分：把 `rs` 低16位视为有符号补码，对17求非负余数（0至16），随后根据rt符号选择高16位全0或全1，写rd。两来源对扩展方向记载相反。"
+    ],
+    "solution": [
+      "> 项目：P4 ｜ 指令：eam ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[jiangshiyi](https://jiangshiyi0822.github.io/2024/11/25/BUAA-CO-P5习题分析/)、[kie-chi](https://kie-chi.com/2024/11/13/CO_P4/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。 本题目前为残题，以下提示不能代替缺失的规格。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

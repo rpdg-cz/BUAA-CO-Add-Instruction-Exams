@@ -38,4 +38,29 @@ function parseStatementSource(statement, id) {
   };
 }
 
-module.exports = { stageOf, compareExercises, parseStatementSource };
+function parseStoredSource(value, expectedKind) {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1) throw new Error('version 必须为 1');
+  const source = value.source;
+  if (!source || typeof source !== 'object' || Array.isArray(source)) throw new Error('source 必须是对象');
+  if (source.kind !== expectedKind) throw new Error(`source.kind 必须为 ${expectedKind}`);
+  const strings = { kind: 16, provenance: 32, project: 64, year: 32, type: 256, author: 1024, url: 8192 };
+  const result = {};
+  for (const key of Object.keys(source)) {
+    const item = source[key];
+    if (Object.hasOwn(strings, key)) {
+      if (item !== null && (typeof item !== 'string' || item.length > strings[key] || item.includes('\0'))) throw new Error(`source.${key} 必须为字符串或 null`);
+    } else if (['problemId', 'pieId'].includes(key)) {
+      if (item !== null && (!Number.isSafeInteger(item) || item < 1)) throw new Error(`source.${key} 必须为正整数或 null`);
+    } else throw new Error(`source 含未知字段 ${key.slice(0, 60)}`);
+    result[key] = item;
+  }
+  if (result.provenance != null && !['recollection', 'proposal'].includes(result.provenance)) throw new Error('source.provenance 值不合法');
+  if (result.url != null) {
+    let parsed;
+    try { parsed = new URL(result.url); } catch (_) { throw new Error('source.url 必须为有效的 HTTP(S) 链接'); }
+    if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('source.url 只允许 HTTP(S) 链接');
+  }
+  return Object.freeze(result);
+}
+
+module.exports = { stageOf, compareExercises, parseStatementSource, parseStoredSource };

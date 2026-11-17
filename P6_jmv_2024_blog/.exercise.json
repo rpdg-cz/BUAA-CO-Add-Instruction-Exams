@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P6",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/12/02/CO/CO-p6-course/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P6_jmv_2024_blog\n\n> 项目：P6 ｜ 指令：jmv ｜ 年份：2024（博客发表年份，未明确原题届次） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/12/02/CO/CO-p6-course/)\n>\n> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。\n\n",
+      "## 课程语义\n\n按课程P6设计要求（本地课程教程：`P6/P6-1.md`），计算类指令不因算术溢出产生异常；应保持课程流水线、转发/暂停及乘除模块的相关规则。控制转移继承课程P5（本地课程教程：`P5/project/P5-5-1.md`）的一条延迟槽，链接使用本指令PC+8。本题未记录的特殊异常、固定总周期门限或额外输入保证不能自行添加。\n\n",
+      "## 出处与资料缺项\n\n- 来源：[owpeter](https://owpeter.github.io/2024/12/02/CO/CO-p6-course/)。\n- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。\n- 2026-11-14从来源MathJax SVG恢复I与I+1两步操作。offset位宽未记录；符号扩展和缩放规则已由公式确认。\n",
+      "2026-11-17 从可见文本移出的维护说明：\n\n博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。\n\n来源字段排列为 `op | rs | rt | offset`；未记录助记符参数书写顺序及opcode。"
+    ],
+    "solution": [
+      "2026-11-17 从可见文本移出的维护说明：\n\n> 项目：P6 ｜ 指令：jmv ｜ 年份：2024（博客发表年份，未明确原题届次） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/12/02/CO/CO-p6-course/)\n\n原文称其为j型仅是作者对跳转功能的分类，字段仍有rs/rt/offset。应按恢复出的公式计算NPC，不能按jal的26位绝对目标拼接，也不能按另一篇btd的左移公式替换。\n\n此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。\n"
+    ]
+  }
+}

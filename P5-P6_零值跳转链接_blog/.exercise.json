@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P5-P6",
+    "year": null,
+    "type": "博客整理",
+    "author": "lsyycf",
+    "url": "https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P5-P6_零值跳转链接_blog\n\n> 项目：P5-P6 ｜ 指令：零值条件寄存器跳转并链接（语义名称） ｜ 年份：未标注 ｜ 类型：博客整理 ｜ 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)\n>\n> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。\n\n",
+      "## 课程语义\n\n本题的具体P5/P6届次未记录，保留P5–P6跨度。依据课程P5设计要求（本地课程教程：`P5/project/P5-5-1.md`），普通控制转移具有一条延迟槽，链接值使用本指令PC+8；本题明确要求取消延迟槽时以题目特例为准。流水线暂停与转发必须使结果等价于按程序顺序执行。本文不向P5/P6新增P7异常机制。\n\n",
+      "## 出处与资料缺项\n\n- 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)。\n- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。\n",
+      "2026-11-17 从可见文本移出的维护说明：\n\n博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。\n\n语义操作数为 `rs、rt`；助记符和实际汇编格式未记录。"
+    ],
+    "solution": [
+      "2026-11-17 从可见文本移出的维护说明：\n\n> 项目：P5-P6 ｜ 指令：零值条件寄存器跳转并链接（语义名称） ｜ 年份：未标注 ｜ 类型：博客整理 ｜ 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)\n\n此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。\n"
+    ]
+  }
+}

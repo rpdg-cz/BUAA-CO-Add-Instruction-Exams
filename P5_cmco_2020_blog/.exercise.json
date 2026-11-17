@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P5",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p5/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P5_cmco_2020_blog\n\n> 项目：P5 ｜ 指令：cmco ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。\n\n非转移指令，不改变控制流。\n\n",
+      "## 出处与资料缺项\n\n[roife](https://roife.github.io/posts/buaa-co-lab-p5/)\n\n来源为作者 P5 第二次上机第一题。原 RTL 的 else 缩进容易误解，本整理依据作者紧接公式的明确文字“统计最长连续1”写出对应等价循环，else 对应当前位为0，而非 run 未超过最长值。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\nopcode/funct 及完整编码未记录。\n\n汇编语法未记录；源为 `rs`，目的为 `rd`。"
+    ],
+    "solution": [
+      "> 项目：P5 ｜ 指令：cmco ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

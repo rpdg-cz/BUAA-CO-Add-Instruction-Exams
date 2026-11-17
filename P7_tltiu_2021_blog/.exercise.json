@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P7",
+    "year": "2021",
+    "type": "博客整理",
+    "author": "master-Tan",
+    "url": "https://master-tan.github.io/2021/12/16/CO%20-%20P7/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P7_tltiu_2021_blog\n\n> 项目：P7 ｜ 指令：tltiu ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/16/CO%20-%20P7/)、[Thysrael](https://thysrael.github.io/posts/4c542040/)\n>\n> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。\n\n",
+      "## 课程语义\n\n按P7 CP0规范（本地课程教程：`P7/implement/P7-2-3.md`）及精确异常规则（本地课程教程：`P7/implement/P7-2-4.md`），异常/中断请求获准提交时统一进入0x4180，受害指令及年轻指令不得留下GPR、HI/LO、内存或外设副作用，较老指令正常完成。记录受害PC及BD；受害指令在延迟槽时EPC为其PC−4且BD=1，否则EPC为其PC且BD=0。普通分支/跳转保留延迟槽，eret无延迟槽。新CP0寄存器的读写亦须保持程序顺序；本题特例与优先级缺项另行说明。\n\n",
+      "## 出处与资料缺项\n\n- 来源：[master-Tan](https://master-tan.github.io/2021/12/16/CO%20-%20P7/)、[Thysrael](https://thysrael.github.io/posts/4c542040/)。\n- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。\n- 操作语义以来源明确给出的“0||sign_extend(immediate)”为准；修正编码疑误不改变该语义。\n",
+      "2026-11-17 从可见文本移出的维护说明：\n\n博客表格把REGIMM操作码写为`000000`，同时rt固定为`01011`。该opcode与REGIMM名称冲突：标准tltiu以及本地MARS的InstructionSet.java中为`000001 rs 01011 immediate`。这里将`000000`保留为来源疑误，不将其当作可直接汇编的原题编码；实际复现应先核定所用编码。\n\n`tltiu rs, immediate`（来源记录），immediate为16位字段。"
+    ],
+    "solution": [
+      "2026-11-17 从可见文本移出的维护说明：\n\n> 项目：P7 ｜ 指令：tltiu ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/16/CO%20-%20P7/)、[Thysrael](https://thysrael.github.io/posts/4c542040/)\n\n此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。\n"
+    ]
+  }
+}

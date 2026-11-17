@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "Pre",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/09/23/CO/BUAA-CO-pre/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# Pre_Verilog按位相乘后统计1的个数_2024_blog\n\n> 项目：Pre ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/23/CO/BUAA-CO-pre/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n来源按记忆转述题意，功能和端口齐全。模块名 `ans` 只见于博客题解，不应推定为官方模块名；原评测用例未保存。\n"
+    ],
+    "solution": [
+      "> 项目：Pre ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/23/CO/BUAA-CO-pre/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。",
+      "组合 always @(*) 中先将 6 位计数变量清零，再用 integer 循环变量遍历 32 位，以阻塞赋值累计，最后驱动 answer。原博客示例未声明 i，实际代码须补上 `integer i;`。组合块内的默认赋值用于每次完整计算，不需要增加 initial 或时钟。"
+    ]
+  }
+}

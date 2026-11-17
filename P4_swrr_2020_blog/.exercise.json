@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p4/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_swrr_2020_blog\n\n> 项目：P4 ｜ 指令：swrr ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\n访存记录地址取 `Addr[31:2] || 00`，数据输出为循环移位后的完整字。顺序继续至 `P0+4`。\n\n",
+      "## 出处与资料缺项\n\n[roife](https://roife.github.io/posts/buaa-co-lab-p4/)\n\n原博客未提供异常或越界语义；内存按课程 DM 的字寻址实现解释，地址低两位用于旋转而不另建非对齐跨字写。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\nopcode 及完整编码未记录。\n\n汇编语法未记录；RTL 使用 `base`、`rt` 和符号扩展的 `offset`。"
+    ],
+    "solution": [
+      "> 项目：P4 ｜ 指令：swrr ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

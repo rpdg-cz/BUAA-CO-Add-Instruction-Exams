@@ -166,6 +166,68 @@ test('the served page loads its local sanitizer and real course detail under CSP
   assert.doesNotMatch(result.stdout, /&lt;table/);
 });
 
+test('the served real jmv blog preserves pre/sub/sup and I/I+1 notation with its private sidecar source under CSP', {
+  skip: !fs.existsSync(browserPath) && 'Set EXERCISE_WEB_BROWSER to a Chromium browser to run DOM integration coverage',
+}, async t => {
+  const id = 'P6_jmv_2024_blog';
+  const original = path.join(repoRoot, id);
+  const statement = fs.readFileSync(path.join(original, `${id}.md`), 'utf8');
+  const metadata = JSON.parse(fs.readFileSync(path.join(original, '.exercise.json'), 'utf8'));
+  const operation = /<pre>\r?\n([\s\S]*?)<\/pre>/.exec(statement);
+  assert.ok(operation, '真实题面应包含操作块');
+  assert.match(operation[1], /temp<sub>31\.\.0<\/sub>/);
+  assert.match(operation[1], /0<sup>2<\/sup>/);
+  assert.match(operation[1], /^I:\r?\n/m);
+  assert.match(operation[1], /^I\+1:\r?\n/m);
+  assert.doesNotMatch(statement, /来源：|课程语义|出处与资料缺项|可见文本移出的维护说明/);
+  assert.ok(metadata.editorial.statement.length > 0, '真实 sidecar 应含隔离的维护记录');
+
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'exercise-web-blog-served-'));
+  const collection = path.join(temporary, 'repo');
+  fs.mkdirSync(collection);
+  fs.cpSync(original, path.join(collection, id), { recursive: true });
+  const server = createServer({ repoRoot: collection, quiet: true });
+  t.after(async () => {
+    if (server.listening) await new Promise(resolve => server.close(resolve));
+    fs.rmSync(temporary, { recursive: true, force: true });
+  });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const page = await fetch(base, { headers: { Connection: 'close' } });
+  assert.equal(page.status, 200);
+  assert.match(page.headers.get('content-security-policy'), /script-src 'self'(?:;|$)/);
+  await page.text();
+  const response = await fetch(`${base}/api/exercises/${id}`, { headers: { Connection: 'close' } });
+  assert.equal(response.status, 200);
+  const { exercise } = await response.json();
+  assert.equal(exercise.statement, statement);
+  assert.deepEqual(exercise.source, metadata.source);
+  assert.equal(Object.hasOwn(exercise, 'editorial'), false);
+  assert.equal(exercise.files.some(file => file.name === '.exercise.json'), false);
+
+  const result = await promisify(execFile)(browserPath, [
+    '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
+    `--user-data-dir=${path.join(temporary, 'profile')}`, '--virtual-time-budget=3000',
+    '--dump-dom', `${base}/`,
+  ], { encoding: 'utf8', timeout: 30000, maxBuffer: 4 * 1024 * 1024, windowsHide: true });
+  assert.match(result.stdout, /id="countLabel">1 \/ 1 道题/);
+  assert.match(result.stdout, /class="detail-title">双寄存器与立即数组合的相对跳转/);
+  const renderedStatement = /<div class="statement">([\s\S]*?)<\/div>/.exec(result.stdout);
+  assert.ok(renderedStatement, '浏览器应通过本地 DOMPurify 渲染真实题面');
+  const renderedOperation = /<pre>([\s\S]*?)<\/pre>/.exec(renderedStatement[1]);
+  assert.ok(renderedOperation, '操作应为实际 pre 元素');
+  assert.equal(renderedOperation[1].replace(/\r\n/g, '\n'), operation[1].replace(/\r\n/g, '\n'));
+  assert.doesNotMatch(renderedStatement[1], /&lt;\/?(?:pre|sub|sup)\b/);
+  assert.doesNotMatch(renderedStatement[1], /editorial|课程语义|出处与资料缺项|可见文本移出的维护说明|本文将博客记录改写/);
+  assert.ok(result.stdout.includes(`<a class="source-link" href="${metadata.source.url}" target="_blank" rel="noreferrer">`));
+  assert.match(result.stdout, /查看来源博客 ↗/);
+  assert.ok(result.stdout.includes(`<small>${metadata.source.author} · ${metadata.source.year}</small>`));
+  assert.match(result.stdout, /data-action="copy-source">复制链接<\/button>/);
+});
+
 test('real browser DOMPurify removes active markup and unsafe URLs while preserving course tables', {
   skip: !fs.existsSync(browserPath) && 'Set EXERCISE_WEB_BROWSER to a Chromium browser to run DOM integration coverage',
 }, () => {

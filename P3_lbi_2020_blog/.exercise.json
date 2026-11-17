@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P3",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p3/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P3_lbi_2020_blog\n\n> 项目：P3 ｜ 指令：lbi ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p3/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP3 为 Logisim 单周期 CPU，无分支延迟槽。\n\n原文 `memory[Addr]` 按课程按字组织的 DM 读出字理解；字节位置由 `Addr[1:0]` 明确选择，不跨字读写。执行后至 `P0+4`。\n\n",
+      "## 出处与资料缺项\n\n[roife](https://roife.github.io/posts/buaa-co-lab-p3/)\n\n原文没有列出 offset 位宽、访存越界处置或测试集；只对课程有效 DM 地址的操作作上述整理。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\nopcode 及完整编码未记录。RTL 使用 `base`、`offset` 和 `rt`。\n\n汇编语法未记录；`base` 是基址寄存器编号，`offset` 是符号扩展的偏移字段。"
+    ],
+    "solution": [
+      "> 项目：P3 ｜ 指令：lbi ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p3/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

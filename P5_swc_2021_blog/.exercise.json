@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P5",
+    "year": "2021",
+    "type": "博客整理",
+    "author": "master-Tan",
+    "url": "https://master-tan.github.io/2021/12/03/CO%20-%20P5/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P5_swc_2021_blog\n\n> 项目：P5 ｜ 指令：swc ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/03/CO%20-%20P5/)、[Thysrael](https://thysrael.github.io/posts/59164957/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。\n\n本题不是内存存储指令，助记符中的sw不能代替真实位运算定义。\n\n",
+      "## 出处与资料缺项\n\n[master-Tan](https://master-tan.github.io/2021/12/03/CO%20-%20P5/)、[Thysrael](https://thysrael.github.io/posts/59164957/)\n\nmaster-Tan 明确规定 `GPR[rt]=0` 时相当于无操作；Thysrael 明确说明移位量取低 5 位。后者给出的通用旋转运算示例不是指令写使能定义，不能据其零位移返回源值否定前者的特殊不写回规则。\n",
+      "记号规范化时移出的维护说明（描述）：\n根据 `GPR[rt]` 中 0 的个数的奇偶性，决定将 `GPR[rs]` 循环左移或右移后写入 `rd`。移位量取 `GPR[rt][4:0]`。`GPR[rt]` 的整个 32 位值为 0 时，按来源的特殊规定不进行写回。"
+    ],
+    "solution": []
+  }
+}

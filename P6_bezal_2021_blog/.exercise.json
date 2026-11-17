@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P6",
+    "year": "2021",
+    "type": "博客整理",
+    "author": "master-Tan",
+    "url": "https://master-tan.github.io/2021/12/10/CO%20-%20P6/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P6_bezal_2021_blog\n\n> 项目：P6 ｜ 指令：bezal ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/10/CO%20-%20P6/)\n>\n> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。\n\n",
+      "## 课程语义\n\n按课程P6设计要求（本地课程教程：`P6/P6-1.md`），计算类指令不因算术溢出产生异常；应保持课程流水线、转发/暂停及乘除模块的相关规则。控制转移继承课程P5（本地课程教程：`P5/project/P5-5-1.md`）的一条延迟槽，链接使用本指令PC+8。本题未记录的特殊异常、固定总周期门限或额外输入保证不能自行添加。\n\n",
+      "## 出处与资料缺项\n\n- 来源：[master-Tan](https://master-tan.github.io/2021/12/10/CO%20-%20P6/)。\n- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。\n",
+      "2026-11-17 从可见文本移出的维护说明：\n\n来源编码：`opcode=000000`、rs、rt、rd、`shamt=00000`、`funct=110001`。来源格式仅有rs和rt，rd字段的固定值未记录；语义目的明确为31号而非rd。\n\n`bezal rs, rt`（来源记录）。"
+    ],
+    "solution": [
+      "2026-11-17 从可见文本移出的维护说明：\n\n> 项目：P6 ｜ 指令：bezal ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[master-Tan](https://master-tan.github.io/2021/12/10/CO%20-%20P6/)\n\n此题解是对博客记述的审慎整理，不代表唯一实现或官方评分标准。\n"
+    ]
+  }
+}

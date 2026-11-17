@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P5",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/11/18/CO/CO-p5-course/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P5_ae_2024_blog\n\n> 项目：P5 ｜ 指令：ae ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/18/CO/CO-p5-course/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。\n\n非转移指令，顺序继续执行，不链接寄存器也不作废后继指令。\n\n",
+      "## 出处与资料缺项\n\n[owpeter](https://owpeter.github.io/2024/11/18/CO/CO-p5-course/)\n\n本次恢复了博客预渲染 MathJax SVG 的公式。博主提示课上 RTL 曾有问题，但所载逐位赋值已确定全部 32 位；未附课上勘误或参考 Mars，不能把其他修正猜成题意。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\n博客位域表：`op(6) | rs(5) | 00000 | imm(16)`；未给出 op 的固定值。\n\n汇编语法未记录；结果写入字段 `rs` 指定的寄存器，固定零字段不是写回目的。"
+    ],
+    "solution": [
+      "> 项目：P5 ｜ 指令：ae ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/18/CO/CO-p5-course/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

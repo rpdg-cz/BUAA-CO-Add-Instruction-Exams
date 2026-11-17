@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p4/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_bsoal_2020_blog\n\n> 项目：P4 ｜ 指令：bsoal ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\n原文跳转赋值与链接赋值共享同一旧 PC；链接不是跳转目标加 4。\n\n",
+      "## 出处与资料缺项\n\n[roife](https://roife.github.io/posts/buaa-co-lab-p4/)\n\n原博客未提供独立测试集或课程官方题面；编码未记录之处不能从助记符推定。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\n原博客未记录 opcode 及完整位域。\n\n汇编语法未记录；语义操作数为 `rs` 和有符号分支位移 `offset`。"
+    ],
+    "solution": [
+      "> 项目：P4 ｜ 指令：bsoal ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

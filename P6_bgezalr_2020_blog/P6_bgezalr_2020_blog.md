@@ -1,42 +1,30 @@
 # P6_bgezalr_2020_blog
 
-> 项目：P6 ｜ 指令：bgezalr ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p6/)
->
-> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。
-
 ## 题目：非负条件寄存器跳转并无条件链接
 
-## 编码与汇编格式
+## 编码
 
-博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。
-
-语义操作数为 `rs、rt、rd`；来源未记录实际汇编书写顺序。
+| 31..0 |
+| --- |
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
 
 ## 描述
 
-将rs按32位补码有符号数判为非负时，执行延迟槽后跳转到旧rt值。无论是否跳转，均将PC+8写入rd。
+GPR[rs]为非负补码数时，执行延迟槽后跳转到旧GPR[rt]指定的地址。无论是否跳转，均将本指令PC+8写入GPR[rd]。
 
 ## 操作
 
-`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
+<pre>
+I:
+    condition ← (GPR[rs] ≥ 0)
+    target ← GPR[rt]
+    GPR[rd] ← PC + 8
+I+1:
+    if condition then
+        PC ← target
+    endif
+</pre>
 
-```text
-condition ← (S32(GPR[rs]) ≥ 0)
-target ← GPR[rt]
-GPR[rd] ← (PC + 8) mod 2^32
-execute instruction at PC + 4
-nextPC ← target if condition else (PC + 8) mod 2^32
-```
+## 限制与异常
 
-## 边界与异常
-
-rs=0满足非负条件。rd与rs或rt相同时，判定和目标都应取本指令写回前的值。不能将写链接错误地做成仅在跳转时发生。
-
-## 课程语义
-
-按课程P6设计要求（本地课程教程：`P6/P6-1.md`），计算类指令不因算术溢出产生异常；应保持课程流水线、转发/暂停及乘除模块的相关规则。控制转移继承课程P5（本地课程教程：`P5/project/P5-5-1.md`）的一条延迟槽，链接使用本指令PC+8。本题未记录的特殊异常、固定总周期门限或额外输入保证不能自行添加。
-
-## 出处与资料缺项
-
-- 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p6/)。
-- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。
+rs为零时满足条件。rd与rs或rt相同也使用链接写回前的源值。延迟槽始终执行。

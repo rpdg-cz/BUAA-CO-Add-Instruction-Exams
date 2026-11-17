@@ -1,42 +1,29 @@
 # P5-P6_区间地址写31号_blog
 
-> 项目：P5-P6 ｜ 指令：按加载值的地址特征选择目的寄存器（语义名称） ｜ 年份：未标注 ｜ 类型：博客整理 ｜ 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)、[FlyingLandlord（上游博客）](https://flyinglandlord.github.io/2021/12/08/BUAA-CO-2021/P6/P6%E8%AF%BE%E4%B8%8A&%E8%AF%BE%E4%B8%8B/)
->
-> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。
+## 题目：按加载字的地址特征选择目的寄存器
 
-## 题目：按加载值的地址特征选择目的寄存器
+## 编码
 
-## 编码与汇编格式
-
-博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。
-
-语义操作数为 `rt、offset、base`；助记符和实际汇编格式未记录。
+| 31..0 |
+| --- |
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
 
 ## 描述
 
-加载内存数据 V。若 V 大于或等于 `0x00003000` 且 V 的低两位均为0，则将 V 写入31号寄存器；否则写入 rt。条件检查对象是加载数据，并不是访存有效地址。 阈值采用无符号比较。
+加载一个32位字。将它作为无符号数与0x00003000比较；若不小于该值且低两位均为0，写入GPR[31]，否则写入GPR[rt]。
 
 ## 操作
 
-`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
+<pre>
+vAddr ← GPR[base] + sign_extend(offset)
+memword ← memory[vAddr]
+if (0 || memword) ≥ (0 || 0x00003000) and memword<sub>1..0</sub> = 0 then
+    GPR[31] ← memword
+else
+    GPR[rt] ← memword
+endif
+</pre>
 
-```text
-EA ← (GPR[base] + SignExtend(offset)) mod 2^32
-V ← Mem32[EA]
-condition ← (U32(V) ≥ 0x00003000) AND (V[1:0] = 0)
-GPR[31 if condition else rt] ← V
-```
+## 限制与异常
 
-## 边界与异常
-
-来源没有给出上界，不能额外添加小于等于0x6ffc的条件。相等0x3000满足阈值和对齐判定。rt=31时两分支目的相同。
-
-## 课程语义
-
-本题的具体P5/P6届次未记录，保留P5–P6跨度。依据课程P5设计要求（本地课程教程：`P5/project/P5-5-1.md`），普通控制转移具有一条延迟槽，链接值使用本指令PC+8；本题明确要求取消延迟槽时以题目特例为准。流水线暂停与转发必须使结果等价于按程序顺序执行。本文不向P5/P6新增P7异常机制。
-
-## 出处与资料缺项
-
-- 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)、[FlyingLandlord（上游博客）](https://flyinglandlord.github.io/2021/12/08/BUAA-CO-2021/P6/P6%E8%AF%BE%E4%B8%8A&%E8%AF%BE%E4%B8%8B/)。
-- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。
-- 2026-11-14复核上游博客lwld一节，给出Verilog形式memword >= 32'h3000；无符号定宽常量使该关系按无符号规则求值，据此恢复比较方式。原来源条件加载通用控制其余与lw相同，地址按base加符号扩展offset并读取整字。
+阈值条件没有上界；检查对象为加载字。rt=31时两分支写入同一寄存器。

@@ -1,47 +1,41 @@
 # P6_LoadPrimeXor_2024_blog
 
-> 项目：P6 ｜ 指令：LoadPrimeXor ｜ 年份：2024（博客发表年份，未明确原题届次） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/12/02/CO/CO-p6-course/)
->
-> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：残题：指令行为尚不能唯一还原。
-
 ## 题目：加载后按低五位的最大质数选择目的寄存器
 
-## 编码与汇编格式
+## 编码
 
-博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。
-
-来源字段排列为 `op | rs | rt | offset`，操作公式把地址源称为base；实际汇编格式、opcode与base对应字段未记录。
+| 31..0 |
+| --- |
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
 
 ## 描述
 
-按base加符号扩展offset得到有效地址，向下对齐到32位字后加载。取加载字的低五位为x，求不大于x的最大质数p，将该加载字写入p号寄存器。目录中的Xor不能作为新增异或操作的依据：原站公式没有与rt异或。
+由GPR[base]加符号扩展offset得到地址，向下对齐到32位字后加载，取加载字低五位为x。求不大于x的最大质数p，将加载字写入GPR[p]。
 
 ## 操作
 
-`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
+以下列出x≥2时的目的编号选择与写回。
 
-```text
-EA ← (GPR[base] + SignExtend(offset)) mod 2^32
-PADDR ← EA AND 0xfffffffc
-W ← Mem32[PADDR]
-x ← U32(W[4:0])
-if x ≥ 2:
-    p ← max{q ∈ {2,3,5,7,11,13,17,19,23,29,31} | q ≤ x}
-    GPR[p] ← W
-else:
-    UNRESOLVED_NO_PRIME
-```
+<pre>
+vAddr ← GPR[base] + sign_extend(offset)
+pAddr ← vAddr<sub>31..2</sub> || 0<sup>2</sup>
+memword ← memory[pAddr]
+x ← memword<sub>4..0</sub>
+p ← 2
+for q in 2 .. x
+    prime ← true
+    for d in 2 .. q - 1
+        if q mod d = 0 then
+            prime ← false
+        endif
+    endfor
+    if prime then
+        p ← q
+    endif
+endfor
+GPR[p] ← memword
+</pre>
 
-## 边界与异常
+## 限制与异常
 
-源公式明确将有效地址向下对齐，因此不同于要求先验证字对齐的普通lw。质数集合不包括0和1。rt在公式中没有作为数据源，不能从另一篇lwz推入异或。
-
-## 课程语义
-
-按课程P6设计要求（本地课程教程：`P6/P6-1.md`），计算类指令不因算术溢出产生异常；应保持课程流水线、转发/暂停及乘除模块的相关规则。控制转移继承课程P5（本地课程教程：`P5/project/P5-5-1.md`）的一条延迟槽，链接使用本指令PC+8。本题未记录的特殊异常、固定总周期门限或额外输入保证不能自行添加。
-
-## 出处与资料缺项
-
-- 来源：[owpeter](https://owpeter.github.io/2024/12/02/CO/CO-p6-course/)。
-- x为0或1时不存在不大于x的质数；来源未给出处理方式或排除此输入的保证。
-- 2026-11-14从来源MathJax SVG恢复vaddr/paddr/word/x四步，确认该篇与lwz不是可直接合并的同一题。
+质数范围为2、3、5、7、11、13、17、19、23、29、31；写回值为整个加载字。

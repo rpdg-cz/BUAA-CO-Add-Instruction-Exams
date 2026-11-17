@@ -1,45 +1,40 @@
 # P6_lwz_2024_blog
 
-> 项目：P6 ｜ 指令：lwz ｜ 年份：2024（博客发表年份，未明确原题届次） ｜ 类型：博客整理 ｜ 来源：[jiangshiyi](https://jiangshiyi0822.github.io/2024/12/16/BUAA-CO-P6习题分析/)
->
-> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：残题：指令行为尚不能唯一还原。
+## 题目：加载后按异或低五位的最大质数选择目的寄存器
 
-## 题目：异或低五位后按最大质数选择加载目的
+## 编码
 
-## 编码与汇编格式
-
-博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。
-
-语义形式为 `lwz rt, offset(base)`；来源未记录完整编码和汇编示例。
+| 31..0 |
+| --- |
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
 
 ## 描述
 
-按lw加载32位字W。将W的低五位与旧GPR[rt]低五位异或得到x，取不大于x的最大质数p，将W写入p号寄存器。
+按lw方式加载一个32位字，将其低五位与旧GPR[rt]的低五位异或得到x。求不大于x的最大质数p，将加载字写入GPR[p]。
 
 ## 操作
 
-`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
+以下列出x≥2时的目的编号选择与写回。
 
-```text
-EA ← (GPR[base] + SignExtend(offset)) mod 2^32
-W ← Mem32[EA]
-x ← U32(W[4:0] XOR GPR[rt][4:0])
-if x ≥ 2:
-    p ← max{q ∈ {2,3,5,7,11,13,17,19,23,29,31} | q ≤ x}
-    GPR[p] ← W
-else:
-    UNRESOLVED_NO_PRIME
-```
+<pre>
+vAddr ← GPR[base] + sign_extend(offset)
+memword ← memory[vAddr]
+x ← memword<sub>4..0</sub> xor GPR[rt]<sub>4..0</sub>
+p ← 2
+for q in 2 .. x
+    prime ← true
+    for d in 2 .. q - 1
+        if q mod d = 0 then
+            prime ← false
+        endif
+    endfor
+    if prime then
+        p ← q
+    endif
+endfor
+GPR[p] ← memword
+</pre>
 
-## 边界与异常
+## 限制与异常
 
-只异或两者低五位；p是寄存器编号，不是写回值，写回值仍为整个W。1不是质数。
-
-## 课程语义
-
-按课程P6设计要求（本地课程教程：`P6/P6-1.md`），计算类指令不因算术溢出产生异常；应保持课程流水线、转发/暂停及乘除模块的相关规则。控制转移继承课程P5（本地课程教程：`P5/project/P5-5-1.md`）的一条延迟槽，链接使用本指令PC+8。本题未记录的特殊异常、固定总周期门限或额外输入保证不能自行添加。
-
-## 出处与资料缺项
-
-- 来源：[jiangshiyi](https://jiangshiyi0822.github.io/2024/12/16/BUAA-CO-P6习题分析/)。
-- 正文定义在x<2时无解；博客代码却默认写1号寄存器。正文与代码冲突，且没有输入保证，不能将回退1冒充原题规定。
+质数范围为2、3、5、7、11、13、17、19、23、29、31；写回值为整个加载字。

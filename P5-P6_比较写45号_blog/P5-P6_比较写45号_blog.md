@@ -1,42 +1,29 @@
 # P5-P6_比较写45号_blog
 
-> 项目：P5-P6 ｜ 指令：比较加载值后写入4号或5号寄存器（语义名称） ｜ 年份：未标注 ｜ 类型：博客整理 ｜ 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)、[FlyingLandlord（上游博客）](https://flyinglandlord.github.io/2021/12/08/BUAA-CO-2021/P6/P6%E8%AF%BE%E4%B8%8A&%E8%AF%BE%E4%B8%8B/)
->
-> 本文将博客记录改写为课程题面式表达，不是课程组官方原题。状态：行为已正规化；编码缺失不影响语义阅读。
+## 题目：比较加载字后写4号或5号寄存器
 
-## 题目：比较加载值后写入4号或5号寄存器
+## 编码
 
-## 编码与汇编格式
-
-博客未记录可验证的opcode/funct及完整位域编码；本文不分配编码。
-
-语义操作数为 `rt、offset、base`；助记符和实际汇编格式未记录。
+| 31..0 |
+| --- |
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx |
 
 ## 描述
 
-从 base+offset 所指内存加载 V。V 大于旧 GPR[rt] 时写入5号寄存器，否则写入4号寄存器。 两数按32位补码有符号整数比较。
+从GPR[base]加符号扩展offset的地址加载一个32位字。将加载字与旧GPR[rt]按补码比较；加载字较大时写入GPR[5]，否则写入GPR[4]。
 
 ## 操作
 
-`GPR`为32个32位通用寄存器，0号读恒为零、写入无效。`U32`/`S32`分别表示同一32位位串的无符号/补码有符号解释；`mod 2^32`只保留低32位。位号从最低位0开始。RTL右侧均读取本指令写回前的源状态；未列出的体系结构状态保持不变。
+<pre>
+vAddr ← GPR[base] + sign_extend(offset)
+memword ← memory[vAddr]
+if memword &gt; GPR[rt] then
+    GPR[5] ← memword
+else
+    GPR[4] ← memword
+endif
+</pre>
 
-```text
-EA ← (GPR[base] + SignExtend(offset)) mod 2^32
-V ← Mem32[EA]
-D ← 5 if S32(V) > S32(GPR[rt]) else 4
-GPR[D] ← V
-```
+## 限制与异常
 
-## 边界与异常
-
-相等属于“否则”，写4号。只有所选目的寄存器被写入，另一个保持不变。
-
-## 课程语义
-
-本题的具体P5/P6届次未记录，保留P5–P6跨度。依据课程P5设计要求（本地课程教程：`P5/project/P5-5-1.md`），普通控制转移具有一条延迟槽，链接值使用本指令PC+8；本题明确要求取消延迟槽时以题目特例为准。流水线暂停与转发必须使结果等价于按程序顺序执行。本文不向P5/P6新增P7异常机制。
-
-## 出处与资料缺项
-
-- 来源：[lsyycf](https://lsyycf.github.io/P5P6%E4%B8%8A%E6%9C%BA/)、[FlyingLandlord（上游博客）](https://flyinglandlord.github.io/2021/12/08/BUAA-CO-2021/P6/P6%E8%AF%BE%E4%B8%8A&%E8%AF%BE%E4%B8%8B/)。
-- 未记录完整官方题面、官方测试与评测周期门限。若编码或汇编书写格式缺失，使用前须另行指定编码；这不等于指令行为残缺。
-- 2026-11-14复核lsyycf列为参考资料的上游2021年P6博客，其lwmx一节明确写“有符号比较”；以此恢复比较方式。来源全文的条件加载类通用控制说明其余与lw相同，据此按符号扩展offset计算地址并读整字；这不足以恢复大小比较的有符号性。
+相等时写4号；另一个目的寄存器保持不变。

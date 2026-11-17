@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P0",
+    "year": "2021",
+    "type": "博客整理",
+    "author": "Xlucidator",
+    "url": "https://www.cnblogs.com/xlucidator/p/15431591.html",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P0_投票表决器_2021_blog\n\n> 项目：P0 ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[Xlucidator](https://www.cnblogs.com/xlucidator/p/15431591.html)、[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n以 Xlucidator 的明确端口表和两来源共同的“赞成大于反对”正文为准。owpeter 的简化“翻译”与该规则不等价，不能用作功能定义；其表头也有排版错误。原模块名与 Appearance 未保存。\n"
+    ],
+    "solution": [
+      "> 项目：P0 ｜ 年份：2021 ｜ 类型：博客整理 ｜ 来源：[Xlucidator](https://www.cnblogs.com/xlucidator/p/15431591.html)、[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。",
+      "## 来源校正"
+    ]
+  }
+}

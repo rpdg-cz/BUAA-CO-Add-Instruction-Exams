@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p4/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_xor_2020_blog\n\n> 项目：P4 ｜ 指令：xor ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p4/)、MIPS-C 指令集第54项（本地课程教程：`assets/cscore-assets/MIPS-C指令集_校对完成版_-指令排序.pdf`）\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\n顺序继续至 `P0+4`。\n\n",
+      "## 出处与资料缺项\n\n[roife](https://roife.github.io/posts/buaa-co-lab-p4/)、MIPS-C 指令集第54项（本地课程教程：`assets/cscore-assets/MIPS-C指令集_校对完成版_-指令排序.pdf`）\n\n博客未重抄 RTL；本次依据其明确指向的课程指令集补齐标准 XOR 的行为和编码，未根据助记符猜测自定义操作。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\n原博客明确指向课程课件的 `xor`；本地 MIPS-C 指令集第 54 项给出：`000000 | rs(5) | rt(5) | rd(5) | 00000 | 100110`。\n\n`xor rd, rs, rt`。"
+    ],
+    "solution": []
+  }
+}

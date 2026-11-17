@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P3",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p3/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P3_balr_2020_blog\n\n> 项目：P3 ｜ 指令：balr ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p3/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP3 为 Logisim 单周期 CPU，无分支延迟槽。\n\n链接值为 `P0+4`，本题不采用 P5 的 `P0+8`。\n\n",
+      "## 出处与资料缺项\n\n[roife](https://roife.github.io/posts/buaa-co-lab-p3/)\n\n原博客未提供独立测试集或课程官方题面；编码未记录之处不能从助记符推定。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\n原博客未记录 opcode、固定字段及字段位宽。RTL 使用 `imm` 与 `rt`，不得直接采用标准 `jalr` 编码。\n\n汇编语法未记录；语义操作数为链接目的寄存器 `rt` 和有符号相对位移字段 `imm`。"
+    ],
+    "solution": [
+      "> 项目：P3 ｜ 指令：balr ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p3/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "可复用相对分支的目标地址计算，并增加无条件 PC 选择与写 `rt` 的链接路径。博客将其类比 `jalr`，这只是数据通路分析提示；目标地址实际由立即数产生，不是从源寄存器取出。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

@@ -1,15 +1,8 @@
 # P3_Gray_code_2024_blog — 题解
 
-> 项目：P3 ｜ 指令：Gray ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/10/28/CO/CO-p3-course/)
+可将两位 Gray 转换做成独立组合单元。每组转换可写成：
 
-本文是实现分析，与题面分开；来源中的做法不代表唯一实现。 本题目前为残题，以下提示不能代替缺失的规格。
-
-## 实现分析
-
-博客建议先做两位 Gray 转换，再将各段拼接后统计或运算，并复用 beq 的 PC 通路。但这段提示与SVG的源操作数及累计写法不一致，不能用来唯一恢复题意。
-
-## 资料说明
-
-[owpeter](https://owpeter.github.io/2024/10/28/CO/CO-p3-course/)
-
-实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。
+<pre>
+gray(x)<sub>1</sub> ← x<sub>1</sub>
+gray(x)<sub>0</sub> ← x<sub>1</sub> xor x<sub>0</sub>
+</pre>

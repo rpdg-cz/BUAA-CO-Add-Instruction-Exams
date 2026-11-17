@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P1",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "UHO",
+    "url": "https://theuho.site/2024/10/15/COexamsP1/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P1_逐位统计不同_2024_blog\n\n> 项目：P1 ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[UHO](https://theuho.site/2024/10/15/COexamsP1/)、[owpeter](https://owpeter.github.io/2024/10/15/CO/CO-p1-course/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n位序来自博客题意，接口来自博客题解框架；尚未取得课程原题面以确认模块名是否为原要求。\n"
+    ],
+    "solution": [
+      "> 项目：P1 ｜ 年份：2024 ｜ 类型：博客整理 ｜ 来源：[UHO](https://theuho.site/2024/10/15/COexamsP1/)、[owpeter](https://owpeter.github.io/2024/10/15/CO/CO-p1-course/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。"
+    ]
+  }
+}

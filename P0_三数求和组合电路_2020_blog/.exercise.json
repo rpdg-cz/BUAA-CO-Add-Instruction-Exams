@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P0",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "roife",
+    "url": "https://roife.github.io/posts/buaa-co-lab-p0/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P0_三数求和组合电路_2020_blog\n\n> 项目：P0 ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p0/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n来源称本题为 2020 年 P0 第二题。同年的“打分求和电路”记录给出相同的门控求和结构，但本记录不能独立确认两者端口次序相同；不把另一题的 tea/s1/s2 接口冒充本题原接口。原始位宽和溢出规则仍须核对。\n",
+      "本记录未保存原信号名、各输入位宽、有无符号解释和输出位宽；a、b、c、y 仅为本页数学记号。输出只依赖当前输入，不需要保存历史输入。"
+    ],
+    "solution": []
+  }
+}

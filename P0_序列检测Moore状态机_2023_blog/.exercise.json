@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P0",
+    "year": "2023",
+    "type": "博客整理",
+    "author": "fysszlr",
+    "url": "https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P0_序列检测Moore状态机_2023_blog\n\n> 项目：P0 ｜ 年份：2023 ｜ 类型：博客整理 ｜ 来源：[fysszlr](https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/)、[Hugo](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n映射以 Hugo 原博客第三题明确表格为准：EEE→1、A0E→2、0A0→3。fysszlr 回忆记录交换了前两种编码，且作者自称顺序可能记错，因此不采用该冲突映射。Hugo 的[完整转移图](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/6.png)中 EEE 状态在 E 输入下自环，支持连续重叠检测。\n\n原信号名、有效时钟沿及复位电平/同步性未保存；核心匹配行为已由上述来源恢复，这些接口细节应在接入测试时单独核对。\n"
+    ],
+    "solution": [
+      "> 项目：P0 ｜ 年份：2023 ｜ 类型：博客整理 ｜ 来源：[fysszlr](https://www.fysszlr.top/2023/10/10/CO-P0%E4%B8%8A%E6%9C%BA%E8%AE%B0%E5%BD%95/)、[Hugo](https://www.hugohealthy.top/2023/10/10/CO-P0-logisim%E7%9B%B8%E5%85%B3/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。",
+      "## 未决限制",
+      "具体匹配编码按 Hugo 明确表格：EEE 为 01、A0E 为 10、0A0 为 11；不要继续沿用 fysszlr 的冲突回忆顺序。若使用前缀状态机，需要在每条转移中保留目标串的有效后缀，EEE 在再次输入 E 后仍为 EEE。原复位接口时序需在适配时核对。"
+    ]
+  }
+}

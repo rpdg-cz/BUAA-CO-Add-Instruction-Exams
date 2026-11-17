@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/11/12/CO/CO-p4-course/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_swmm_2024_blog\n\n> 项目：P4 ｜ 指令：swmm ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/12/CO/CO-p4-course/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\n执行后至 `P0+4`；访存仍须落在课程 DM 有效地址范围。\n\n",
+      "## 出处与资料缺项\n\n[owpeter](https://owpeter.github.io/2024/11/12/CO/CO-p4-course/)\n\n原博客公式实际保存在 MathJax SVG 中，旧文本抽取遗漏；本次已核对 SVG 中完整 RTL。年份按2024年文章记录，SWMM为文中第一条指令；未记录越界处理。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\n博客位域表：`110100 | base(5) | rt(5) | offset(16)`。\n\n汇编语法未记录；字段按上表，`offset` 为 16 位符号偏移。"
+    ],
+    "solution": [
+      "> 项目：P4 ｜ 指令：swmm ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/12/CO/CO-p4-course/)",
+      "本文是实现分析，与题面分开；来源中的做法不代表唯一实现。",
+      "在地址形成逻辑中增加由 `rt[0]` 控制的选择器，选择 `vAddr[31:2]||00` 或 `vAddr[29:0]||00`。数据仍走原存字路径。博客将选择逻辑放入自己的 DM，这只是模块划分方案。",
+      "## 资料说明",
+      "实现中的信号名、流水级分配与 Tuse/Tnew 数值取决于具体数据通路，应根据实际使用和产生数据的时刻重新计算。\n"
+    ]
+  }
+}

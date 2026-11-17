@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P4",
+    "year": "2024",
+    "type": "博客整理",
+    "author": "kie-chi",
+    "url": "https://kie-chi.com/2024/11/13/CO_P4/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P4_olw_2024_blog\n\n> 项目：P4 ｜ 指令：olw ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[kie-chi](https://kie-chi.com/2024/11/13/CO_P4/)\n\n本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。\n\n> 整理状态：残题。已核对来源，现有证据不能唯一确定完整指令行为；以下仅整理可核实部分，不作为可独立实现的完整规格。\n\n",
+      "## 课程阶段注意\n\nP4 为 Verilog 单周期 CPU，无分支延迟槽。\n\n这是条件加载，不是条件访存地址跳转；不满足条件时应保留rt旧值。\n\n",
+      "## 出处与资料缺项\n\n[kie-chi](https://kie-chi.com/2024/11/13/CO_P4/)\n\n残题关键缺项：func的精确定义。地址拼接和写回条件结构清楚，但不足以唯一实现该指令。\n",
+      "记号规范化时移出的维护说明（编码与格式）：\nI型；opcode未记录。\n\n`olw rt, offset(base)`。",
+      "记号规范化时移出的维护说明（边界条件）：\n无法确定按位、按字节、十六进制数位或其他分组判单调，也无法确定从高位到低位还是反向。不得自行选择其中一种。"
+    ],
+    "solution": []
+  }
+}

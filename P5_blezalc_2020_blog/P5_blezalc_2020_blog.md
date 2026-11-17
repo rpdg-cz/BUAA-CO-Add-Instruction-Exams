@@ -1,47 +1,30 @@
 # P5_blezalc_2020_blog
 
-> 项目：P5 ｜ 指令：blezalc ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
-
-本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。
-
 ## 题目：非正分支并条件链接
 
-## 编码与格式
+## 编码
 
-opcode 及完整编码未记录。
-
-汇编语法未记录；源为 `rs`，位移字段为 `offset`。
+| 31..0 |
+| --- |
+| `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
 
 ## 描述
 
-将 `rs` 按 32 位有符号补码解释。仅在数值小于或等于 0 时跳转并链接；大于 0 时顺序执行且不写链接寄存器。
+将 GPR[rs] 按 32 位补码解释。数值小于或等于 0 时进行相对分支，并将 PC + 8 写入 GPR[31]；大于 0 时不分支、不链接。两种情况下均执行延迟槽。
 
 ## 操作
 
-`GPR[n]` 是 32 位寄存器位串，位编号从最低位 0 到最高位 31；`x[h:l]` 包含两端，`||` 表示高位在左的拼接。`S32(x)` 表示将 32 位位串按二进制补码解释；`SEXT32(x)` 表示按原字段最高位符号扩展到 32 位。涉及 PC 时，`P0` 固定指本指令的地址，所有右侧源寄存器均取本指令执行前的值。课程规定的普通 32 位加减法保留低 32 位，不因溢出触发异常；本题显式给出更宽运算或溢出检测时按本题执行。写入 0 号寄存器不改变其恒零状态。
+<pre>
+I:   condition ← GPR[rs] ≤ 0
+     target_offset ← sign_extend(offset || 0<sup>2</sup>)
+     if condition then
+         GPR[31] ← PC + 8
+     endif
+I+1: if condition then
+         PC ← PC + target_offset
+     endif
+</pre>
 
-```text
-condition ← (S32(GPR[rs]) ≤ 0)
-if condition:
-    GPR[31] ← low32(P0 + 8)
-    after_delay_slot_PC ← low32(P0 + 4 + SEXT32(offset || 00))
-else:
-    after_delay_slot_PC ← low32(P0 + 8)
-execute instruction at P0+4 as the delay slot
-```
+## 其他
 
-## 边界条件
-
-零与所有负数均满足；`0x7FFFFFFF` 不满足。不满足条件时 31 号寄存器保持原值。
-
-## 课程阶段注意
-
-P5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。
-
-博客更正后的 RTL 没有作废延迟槽动作，按课程普通延迟槽执行。不能套用 bgezall 的分支不成立时作废规则。
-
-## 出处与资料缺项
-
-[roife](https://roife.github.io/posts/buaa-co-lab-p5/)
-
-作者 P5 第二次上机第二题；题意采用作者明确标出的更正版“跳转才链接”，不是声称恢复了考试未经勘误的官方 RTL。
+零与所有负数均满足分支条件。条件不成立时，GPR[31] 保持原值。

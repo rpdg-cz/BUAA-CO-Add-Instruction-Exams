@@ -1,47 +1,34 @@
 # P5_lwoc_2024_blog
 
-> 项目：P5 ｜ 指令：lwoc ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[kie-chi](https://kie-chi.com/2024/11/14/CO_P5/)、[jiangshiyi](https://jiangshiyi0822.github.io/2024/11/25/BUAA-CO-P5习题分析/)
-
-本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。
-
 ## 题目：依据读出字选择寄存器的加载
 
-## 编码与格式
+## 编码
 
-jiangshiyi 的译码示例给出 I 型 `opcode=111110`：`111110 | base(5) | rt(5) | offset(16)`；kie-chi 未记固定 opcode。此编码仅属于该题的记录，不代表本题和其他同 opcode 往届题可同时启用。
+| 31..26 | 25..21 | 20..16 | 15..0 |
+| --- | --- | --- | --- |
+| `111110` | `base` | `rt` | `offset` |
 
-`lwoc rt, offset(base)`。
+## 格式
+
+`lwoc rt, offset(base)`
 
 ## 描述
 
-将 16 位偏移先拼接两位零并符号扩展，计算有效字节地址，读取其所在的字。若所读 32 位无符号数小于 `0x80000000`，写回目的编号取该字低 4 位；否则写回 `rt`。写入的数据均为完整读出字。
+将 16 位 offset 末尾补两位 0 后符号扩展，与 GPR[base] 相加。取结果高 30 位选择内存字。若读出字按无符号数解释小于 0x80000000，则写入该字低 4 位指定的寄存器；否则写入 GPR[rt]。两种情况的写回数据均为完整读出字。
 
 ## 操作
 
-`GPR[n]` 是 32 位寄存器位串，位编号从最低位 0 到最高位 31；`x[h:l]` 包含两端，`||` 表示高位在左的拼接。`S32(x)` 表示将 32 位位串按二进制补码解释；`SEXT32(x)` 表示按原字段最高位符号扩展到 32 位。涉及 PC 时，`P0` 固定指本指令的地址，所有右侧源寄存器均取本指令执行前的值。课程规定的普通 32 位加减法保留低 32 位，不因溢出触发异常；本题显式给出更宽运算或溢出检测时按本题执行。写入 0 号寄存器不改变其恒零状态。
+<pre>
+vAddr ← GPR[base] + sign_extend(offset || 0<sup>2</sup>)
+memword ← memory[vAddr<sub>31..2</sub> || 0<sup>2</sup>]
+if (0 || memword) &lt; (0 || 0x80000000) then
+    mem_reg ← 0 || memword<sub>3..0</sub>
+else
+    mem_reg ← rt
+endif
+GPR[mem_reg] ← memword
+</pre>
 
-```text
-addr ← low32(GPR[base] + SEXT32(offset || 00))
-word ← MemWordIndex[unsigned(addr[31:2])]
-if unsigned(word) < 0x80000000:
-    dest ← unsigned(word[3:0])
-else:
-    dest ← rt
-GPR[dest] ← word
-```
+## 其他
 
-## 边界条件
-
-比较是无符号比较，等价于 `word[31]=0`；恰为 `0x80000000` 时写 `rt`。低4位编号为0时丢弃写入。地址先做32位相加，再按原RTL取 `[31:2]`，不是把 offset 直接作为字节偏移；offset=1 对地址贡献4。
-
-## 课程阶段注意
-
-P5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。
-
-非转移指令。选择目的寄存器的条件与寄存器编号都依赖内存返回值；写回前须保持指令顺序语义。
-
-## 出处与资料缺项
-
-[kie-chi](https://kie-chi.com/2024/11/14/CO_P5/)、[jiangshiyi](https://jiangshiyi0822.github.io/2024/11/25/BUAA-CO-P5习题分析/)
-
-两来源对读数选择目的的行为一致；jiangshiyi 中 `offset<<2 || 0²` 的混合记法由 kie-chi 明确的 `offset||00` RTL澄清为只左移一次。按原RTL取地址高30位，未自行增加地址异常。
+读出字等于 0x80000000 时写入 rt。低 4 位目的编号为 0 时丢弃写入。offset 为 1 时，对有效地址的贡献为 4。

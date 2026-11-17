@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "source": {
+    "kind": "blog",
+    "provenance": "recollection",
+    "project": "P0",
+    "year": "2020",
+    "type": "博客整理",
+    "author": "owpeter",
+    "url": "https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/",
+    "problemId": null,
+    "pieId": null
+  },
+  "editorial": {
+    "statement": [
+      "# P0_打分求和电路_2020_blog\n\n> 项目：P0 ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)\n\n> 本页据非官方博客整理；来源事实、整理性解释和未决信息分别说明，不代表课程组原题。\n\n",
+      "## 来源与未决信息\n\n来源中的题号为 `2020_T2`。模块名、Appearance 和原评测用例未收录；以上功能和位宽可由来源端口表完整确定。\n"
+    ],
+    "solution": [
+      "> 项目：P0 ｜ 年份：2020 ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/09/12/CO/BUAA-CO-%E5%89%8D%E4%BC%A0/)",
+      "> 本页为依据来源与题面整理的解释；修正原记录的错误与省略，不视为课程官方答案。残题只讨论可确认的部分。"
+    ]
+  }
+}

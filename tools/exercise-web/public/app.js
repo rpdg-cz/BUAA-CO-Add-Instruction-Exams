@@ -228,6 +228,7 @@ function renderDetail() {
   ];
   if (source.project) chips.push(`<span class="chip">项目 <b>${escapeHtml(source.project)}</b></span>`);
   if (source.type) chips.push(`<span class="chip">类型 <b>${escapeHtml(source.type)}</b></span>`);
+  if (item.metadataDiagnostic) chips.push(`<span class="chip" title="${escapeHtml(item.metadataDiagnostic)}">元数据待修复</span>`);
 
   const tabs = [
     ['statement', '题面'],

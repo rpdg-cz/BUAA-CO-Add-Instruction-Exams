@@ -1,48 +1,36 @@
 # P5_bmoal_2024_blog
 
-> 项目：P5 ｜ 指令：bmoal ｜ 年份：2024（博客发布年；场次见出处） ｜ 类型：博客整理 ｜ 来源：[owpeter](https://owpeter.github.io/2024/11/18/CO/CO-p5-course/)
-
-本题由博客回忆、题面摘录及明确标出的课程资料整理，不是课程组发布的原题；未补造指令编码或行为。
-
 ## 题目：一位多于零位时分支并链接
 
-## 编码与格式
+## 编码
 
-博客位域表：`op(6) | rs(5) | 00000 | offset(16)`；op 固定值未给出。
-
-汇编语法未记录；`rs` 指定待计数寄存器，`offset` 是 16 位有符号分支位移。
+| 31..26 | 25..21 | 20..16 | 15..0 |
+| --- | --- | --- | --- |
+| `xxxxxx` | `rs` | `00000` | `offset` |
 
 ## 描述
 
-统计 `rs` 的 32 位中 1 与 0 的数量。仅当 1 的数量严格大于 0 的数量时进行相对分支，并将 `P0+8` 写入 31 号寄存器；否则不链接。
+统计 GPR[rs] 的 32 位中 1 与 0 的数量。仅当 1 的数量严格大于 0 的数量时进行相对分支，并将 PC + 8 写入 GPR[31]；否则不链接。延迟槽指令在两种情况下均执行。
 
 ## 操作
 
-`GPR[n]` 是 32 位寄存器位串，位编号从最低位 0 到最高位 31；`x[h:l]` 包含两端，`||` 表示高位在左的拼接。`S32(x)` 表示将 32 位位串按二进制补码解释；`SEXT32(x)` 表示按原字段最高位符号扩展到 32 位。涉及 PC 时，`P0` 固定指本指令的地址，所有右侧源寄存器均取本指令执行前的值。课程规定的普通 32 位加减法保留低 32 位，不因溢出触发异常；本题显式给出更宽运算或溢出检测时按本题执行。写入 0 号寄存器不改变其恒零状态。
+<pre>
+I:   count ← 0
+     for i in 0 .. 31
+         if GPR[rs]<sub>i</sub> = 1 then
+             count ← count + 1
+         endif
+     endfor
+     condition ← count &gt; 16
+     target_offset ← sign_extend(offset || 0<sup>2</sup>)
+     if condition then
+         GPR[31] ← PC + 8
+     endif
+I+1: if condition then
+         PC ← PC + target_offset
+     endif
+</pre>
 
-```text
-cnt1 ← number_of_one_bits(GPR[rs])
-cnt0 ← 32 - cnt1
-if cnt1 > cnt0:
-    GPR[31] ← low32(P0 + 8)
-    after_delay_slot_PC ← low32(P0 + 4 + SEXT32(offset || 00))
-else:
-    after_delay_slot_PC ← low32(P0 + 8)
-execute instruction at P0+4 as the delay slot
-```
+## 其他
 
-## 边界条件
-
-恰有 16 个 1 时不跳转、不链接；至少 17 个 1 时满足条件。计数包含符号位，不是有符号大小比较。
-
-## 课程阶段注意
-
-P5 为五级流水线 CPU，课程普通转移有一条延迟槽；本题若明确要求作废延迟槽，按本题的条件执行。非转移指令不自行产生控制转移。
-
-恢复的 RTL 没有作废延迟槽操作，采用课程普通的一条延迟槽。链接是条件写入，不能按 bgezall 的无条件链接处理。
-
-## 出处与资料缺项
-
-[owpeter](https://owpeter.github.io/2024/11/18/CO/CO-p5-course/)
-
-完整条件及链接动作来自博客 MathJax SVG，旧纯文本抽取遗漏了这一部分；不是从助记符推导。
+恰有 16 个 1 时不分支、不链接；至少有 17 个 1 时分支并链接。符号位参与计数。
